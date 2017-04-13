@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/search_call"
+        android:icon="@drawable/ic_search_black_24dp"
+        android:title="@string/title_search" />
+
+    <item
+        android:id="@+id/comparison_call"
+        android:icon="@drawable/ic_favorite_black_24dp"
+        android:title="@string/title_favorite" />
+
+    <item
+        android:id="@+id/about_call"
+        android:icon="@drawable/ic_assignment_late_black_24dp"
+        android:title="@string/title_nearby" />
+
+</menu>
