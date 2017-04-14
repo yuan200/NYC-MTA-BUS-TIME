@@ -14,9 +14,11 @@ public class TimeInfo {
     private String mPresentableDistance;
     private String mPublishedLineName;
     private String mStopsFromCall;
+    private Boolean mIsFail;
+    private String mErrorMessage;
 
     public TimeInfo(){
-
+        mErrorMessage = "error";
     }
 
     public String getExpectedArrivalTime() {
@@ -73,5 +75,21 @@ public class TimeInfo {
 
     public void setStopsFromCall(String stopsFromCall) {
         mStopsFromCall = stopsFromCall;
+    }
+
+    public String getErrorMessage() {
+        return mErrorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        mErrorMessage = errorMessage;
+    }
+
+    public Boolean getFail() {
+        return mIsFail;
+    }
+
+    public void setFail(Boolean fail) {
+        mIsFail = fail;
     }
 }

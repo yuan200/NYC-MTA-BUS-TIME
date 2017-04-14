@@ -71,6 +71,12 @@ public final class NetworkUtilities {
         }
     }
 
+    /**
+     * read item from the json object
+     * @param result
+     * @param item
+     * @return
+     */
     public static TimeInfo getSpecificItem(String result,String item){
         TimeInfo timeInfoObject = new TimeInfo();
         try{
@@ -85,6 +91,21 @@ public final class NetworkUtilities {
             Log.v(TAG,"json ojbect3: " + stopMonitoringDelivery);
             JSONObject stopMonitoringDeliveryJsonObject = stopMonitoringDelivery.getJSONObject(0);
             Log.v(TAG,"json ojbect4: " + stopMonitoringDeliveryJsonObject);
+
+            // check if there are error
+            if (stopMonitoringDeliveryJsonObject.has("ErrorCondition")){
+                JSONObject errorConditionJsonObject = stopMonitoringDeliveryJsonObject.getJSONObject("ErrorCondition");
+                if (errorConditionJsonObject.has("OtherError")){
+                    JSONObject otherErrorJsonObject = errorConditionJsonObject.getJSONObject("OtherError");
+                    timeInfoObject.setFail(false);
+                    timeInfoObject.setErrorMessage(otherErrorJsonObject.getString("ErrorText"));
+                    return timeInfoObject;
+                }else{
+                    timeInfoObject.setFail(false);
+                    return timeInfoObject;
+                }
+            }
+
             JSONArray monitorStopVisitJsonArray = stopMonitoringDeliveryJsonObject.getJSONArray("MonitoredStopVisit");
             Log.v(TAG,"json ojbect5: " + monitorStopVisitJsonArray);
             JSONObject monitoredVehicleJourneyJsonObject = monitorStopVisitJsonArray.getJSONObject(0);

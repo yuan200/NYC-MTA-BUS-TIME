@@ -2,6 +2,7 @@ package com.wen.android.mtabuscomparison;
 
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,22 +20,41 @@ import java.util.Date;
 public class SearchResultActivity extends AppCompatActivity {
 
     private TextView mBusTimeInfoView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_result);
 
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.result_swipe_refresh_layout);
         mBusTimeInfoView = (TextView)findViewById(R.id.bus_info_view_1);
         Date curDate = new Date();
 
-        Intent intentThatStartedThisActivity = getIntent();
-        if (intentThatStartedThisActivity.hasExtra(Intent.EXTRA_TEXT)){
-            String[] recivedBusStopCode = intentThatStartedThisActivity.getStringArrayExtra(Intent.EXTRA_TEXT);
+        final Intent intentThatStartedThisActivity = getIntent();
+        startBusTrackOperation(intentThatStartedThisActivity);
+        mSwipeRefreshLayout.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener(){
+                    @Override
+                    public void onRefresh() {
+                        mBusTimeInfoView.setText("");
+                        startBusTrackOperation(intentThatStartedThisActivity);
+                    }
+                }
+        );
+    }
+
+    /**
+     * This method will start operation to track the bus
+     * @param intent extract the bus stop code from intent's Extra
+     * @return void
+     */
+    public void startBusTrackOperation(Intent intent){
+        if (intent.hasExtra(Intent.EXTRA_TEXT)){
+            String[] recivedBusStopCode = intent.getStringArrayExtra(Intent.EXTRA_TEXT);
             for(String stopcode:recivedBusStopCode){
                 makeBusTimeSearchQuery(stopcode);
             }
-
         }
     }
 
@@ -66,6 +86,12 @@ public class SearchResultActivity extends AppCompatActivity {
         protected void onPostExecute(TimeInfo expectedTime) {
             Date strToDate;
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
+            if(expectedTime.getFail() == false){
+                mBusTimeInfoView.setText(expectedTime.getErrorMessage());
+                return;
+            }
+
             mBusTimeInfoView.append(expectedTime.getPublishedLineName() + "\n\n");
             mBusTimeInfoView.append(expectedTime.getStopPointName() + "\n");
             if (!expectedTime.getExpectedArrivalTime().equals("NoExpectedItem")){
@@ -99,6 +125,8 @@ public class SearchResultActivity extends AppCompatActivity {
             }else {
                 mBusTimeInfoView.append("\n\n");
             }
+
+            mSwipeRefreshLayout.setRefreshing(false);
 
         }
     }

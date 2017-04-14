@@ -39,8 +39,10 @@ public class SaveComparison extends AppCompatActivity {
         mSaveButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 saveStopCode();
+                finish();
             }
         });
+
 
     }
 
