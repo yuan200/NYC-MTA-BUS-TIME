@@ -29,6 +29,7 @@ public class BusDbHelper extends SQLiteOpenHelper {
                 BusContract.BusEntry.COLUMN_BUS_STOP_GROUP + " TEXT, " +
                 BusContract.BusEntry.COLUMN_TIMESTAMP + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
                 "); ";
+        /**
         final String SQL_CREATE_SINGLE_BUSTLIST_TABLE = "CREATE TABLE " + BusContract.BusEntry.TABLE_NAME_SINGLE_BUS + " (" +
                 BusContract.BusEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 BusContract.BusEntry.COLUMN_BUS_STOP_CODE + " TEXT NOT NULL, " +
@@ -36,8 +37,19 @@ public class BusDbHelper extends SQLiteOpenHelper {
                 BusContract.BusEntry.COLUMN_BUS_LINE + " TEXT,NOT NULL, " +
                 BusContract.BusEntry.COLUMN_TIMESTAMP + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
                 "); ";
+         **/
         sqLiteDatabase.execSQL(SQL_CREATE_BUSTLIST_TABLE);
-        sqLiteDatabase.execSQL(SQL_CREATE_SINGLE_BUSTLIST_TABLE);
+        //sqLiteDatabase.execSQL(SQL_CREATE_SINGLE_BUSTLIST_TABLE);
+        //insert sample data
+        sqLiteDatabase.execSQL("INSERT INTO "+ BusContract.BusEntry.TABLE_NAME + " (" +
+                BusContract.BusEntry.COLUMN_BUS_STOP_CODE + ", " +
+                BusContract.BusEntry.COLUMN_BUS_STOP_CODE2 + ", " +
+                BusContract.BusEntry.COLUMN_BUS_STOP_GROUP + ") " +
+                "VALUES (" +
+                "\'550552\', " +
+                "\'551575\', " +
+                "\'sample\'); ");
+
     }
 
     @Override

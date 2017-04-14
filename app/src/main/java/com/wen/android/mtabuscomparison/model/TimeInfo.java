@@ -18,6 +18,7 @@ public class TimeInfo {
     private String mErrorMessage;
 
     public TimeInfo(){
+        mIsFail = true;
         mErrorMessage = "error";
     }
 
