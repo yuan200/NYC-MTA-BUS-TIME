@@ -7,6 +7,8 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -16,7 +18,6 @@ import com.wen.android.mtabuscomparison.Fragment.SearchFragment;
 
 public class MainActivity extends AppCompatActivity {
 
-    private EditText mBusStopCode;
     BottomNavigationView bottomNavigationView;
 
     private ViewPager viewPager;
@@ -32,12 +33,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //Initializing search fragment component
-        mBusStopCode = (EditText)findViewById(R.id.bus_stop_code);
-
-
         //Initializing vewPage
         viewPager = (ViewPager) findViewById(R.id.viewpaper);
+        //disable swipe page
+        viewPager.setOnTouchListener(new View.OnTouchListener(){
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
 
         //Initializing bottomNavigationView
         bottomNavigationView = (BottomNavigationView)findViewById(R.id.bottom_navigation) ;

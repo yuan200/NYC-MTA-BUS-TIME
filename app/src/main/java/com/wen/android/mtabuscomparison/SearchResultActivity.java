@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 public class SearchResultActivity extends AppCompatActivity {
@@ -53,8 +55,12 @@ public class SearchResultActivity extends AppCompatActivity {
         if (intent.hasExtra(Intent.EXTRA_TEXT)){
             String[] recivedBusStopCode = intent.getStringArrayExtra(Intent.EXTRA_TEXT);
             for(String stopcode:recivedBusStopCode){
-                makeBusTimeSearchQuery(stopcode);
+                Log.i("stopcodedebug:", "stop code:" + stopcode);
+                if (!stopcode.equals("")){
+                    makeBusTimeSearchQuery(stopcode);
+                }
             }
+            mSwipeRefreshLayout.setRefreshing(false);
         }
     }
 
@@ -67,66 +73,88 @@ public class SearchResultActivity extends AppCompatActivity {
     }
 
 
-    public class FetchBusTimeTask extends AsyncTask<URL, Void, TimeInfo> {
+    public class FetchBusTimeTask extends AsyncTask<URL, Void, ArrayList<TimeInfo>> {
         @Override
-        protected TimeInfo doInBackground(URL... params) {
+        protected ArrayList<TimeInfo> doInBackground(URL... params) {
             URL  searchUrl = params[0];
             String busTimeInqueryResult = null;
             TimeInfo expectedTime = null;
+            ArrayList<TimeInfo> stopsTimeInfo = null;
             try{
                 busTimeInqueryResult = NetworkUtilities.getResponseFromHttpUrl(searchUrl);
-                expectedTime = NetworkUtilities.getSpecificItem(busTimeInqueryResult,"ExpectedArrivalTime");
+                //expectedTime = NetworkUtilities.getSpecificItem(busTimeInqueryResult,"ExpectedArrivalTime");
+                stopsTimeInfo = (ArrayList<TimeInfo>)NetworkUtilities.getSpecificItem(busTimeInqueryResult, "ExpectedArrivalTime");
             } catch (IOException e){
                 e.printStackTrace();
             }
-            return expectedTime;
+            //return expectedTime;
+            return stopsTimeInfo;
         }
 
         @Override
-        protected void onPostExecute(TimeInfo expectedTime) {
+        protected void onPostExecute(ArrayList<TimeInfo> stopsTimeInfo) {
             Date strToDate;
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+            //SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
-            if(expectedTime.getFail() == false){
-                mBusTimeInfoView.setText(expectedTime.getErrorMessage());
-                return;
-            }
+            TimeInfo errorChecking = stopsTimeInfo.get(0);
 
-            mBusTimeInfoView.append(expectedTime.getPublishedLineName() + "\n\n");
-            mBusTimeInfoView.append(expectedTime.getStopPointName() + "\n");
-            if (!expectedTime.getExpectedArrivalTime().equals("NoExpectedItem")){
+            for (int i = 0; i < stopsTimeInfo.size(); i++){
+                // don't wanna give too many info
+                if (i > 2 ){
+                    return;
+                }
+                TimeInfo expectedTime = stopsTimeInfo.get(i);
+                if(expectedTime.getFail() == false){
+                    mBusTimeInfoView.setText(errorChecking.getErrorMessage());
+                    return;
+                }
+                mBusTimeInfoView.append("\n" + expectedTime.getPublishedLineName() + "\n");
 
-                try{
-                    strToDate = format.parse(expectedTime.getExpectedArrivalTime());
-                    Date currentDate = new Date();
-                    Log.d("timedebug", "default pattern: "+ strToDate);
-                    Long diff = strToDate.getTime() - currentDate.getTime();
-                    Log.d("timedebug", "diff: "+ diff);
+                Log.i("timedebug==========", "size:" + stopsTimeInfo.size());
+                Log.i("timedebug==========", expectedTime.getPublishedLineName());
+                mBusTimeInfoView.append(expectedTime.getStopPointName() + "\n");
+                if (!expectedTime.getExpectedArrivalTime().equals("NoExpectedItem")){
 
-                    int minutes = (int) ((diff / (1000*60)) % 60);
-                    Log.d("timedebug", "diff: "+ minutes);
-                    mBusTimeInfoView.append(strToDate.getHours() + ":" + strToDate.getMinutes() + "\n");
-                    mBusTimeInfoView.append(minutes + " min" +"\n");
-                } catch (ParseException e) {
-                    e.printStackTrace();
+                    try{
+                        strToDate = format.parse(expectedTime.getExpectedArrivalTime());
+                        Date currentDate = new Date();
+                        Long diff = strToDate.getTime() - currentDate.getTime();
+
+                        int minutes = (int) ((diff / (1000*60)) % 60);
+                        Calendar cal = Calendar.getInstance();
+                        cal.setTime(strToDate);
+                        //mBusTimeInfoView.append(strToDate.getHours() + ":" + strToDate.getMinutes() + "\n");
+                        String hour = String.format("%02d:%02d", cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE));
+                        //mBusTimeInfoView.append(cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE) + "\n");
+                        mBusTimeInfoView.append("Expected arrival time: " +hour + "\n");
+                        mBusTimeInfoView.append(minutes + " min" +"\n");
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if(!expectedTime.getPresentableDistance().equals("NoNumberOfStopsAway"))
+                    mBusTimeInfoView.append(expectedTime.getPresentableDistance()  + "\n");
+                if(!expectedTime.getArrivalProximityText().equals("can not track distance now"))
+                    mBusTimeInfoView.append(expectedTime.getArrivalProximityText() + " miles away" + "\n");
+                Log.i("timedebug====", "ArrivalProximityText: " + expectedTime.getArrivalProximityText());
+                if (!expectedTime.getOriginAimedDepartureTime().equals("NoOriginAimedDepartureTime")) {
+                    Log.i("timedebug====", "OriginAimDepartureTime: " + expectedTime.getOriginAimedDepartureTime());
+                    try{
+                        strToDate = format.parse(expectedTime.getOriginAimedDepartureTime());
+                        Calendar cal = Calendar.getInstance();
+                        cal.setTime(strToDate);
+                        String DepartTime = String.format("%02d:%02d",cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE));
+                        mBusTimeInfoView.append("Departure Time: " + DepartTime+ "\n");
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }else {
+                    mBusTimeInfoView.append("\n\n");
                 }
             }
-            if(!expectedTime.getPresentableDistance().equals("NoNumberOfStopsAway"))
-                mBusTimeInfoView.append(expectedTime.getPresentableDistance()  + "\n");
-            if(!expectedTime.getArrivalProximityText().equals("can not track distance now"))
-                mBusTimeInfoView.append(expectedTime.getArrivalProximityText() + " miles away" + "\n");
-            if (!expectedTime.getOriginAimedDepartureTime().equals("NoOriginAimedDepartureTime")) {
-                try{
-                    strToDate = format.parse(expectedTime.getOriginAimedDepartureTime());
-                    mBusTimeInfoView.append("Departure Time: " + strToDate.getHours() + ":" + strToDate.getMinutes() + "\n");
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-            }else {
-                mBusTimeInfoView.append("\n\n");
-            }
 
-            mSwipeRefreshLayout.setRefreshing(false);
+            //mSwipeRefreshLayout.setRefreshing(false);
 
         }
     }

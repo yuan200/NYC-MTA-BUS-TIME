@@ -3,6 +3,8 @@ package com.wen.android.mtabuscomparison.utilities;
 import android.net.Uri;
 import android.util.Log;
 
+import com.wen.android.mtabuscomparison.model.BusDirection;
+import com.wen.android.mtabuscomparison.model.StopsForRoute;
 import com.wen.android.mtabuscomparison.model.TimeInfo;
 
 import org.json.JSONArray;
@@ -14,7 +16,9 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -22,6 +26,7 @@ import java.util.Scanner;
  */
 
 public final class NetworkUtilities {
+    //for MTA siri
     private static final String TAG = "JsonObject";
     private static final String SIRI_BUSTIME_URL =
             "http://bustime.mta.info/api/siri/stop-monitoring.json";
@@ -29,6 +34,17 @@ public final class NetworkUtilities {
     static final String API_KEY =
             "272e0b38-54a4-485f-875a-e9b1460a9509";
     static final String MONITORING_REF ="MonitoringRef";
+
+    //for MTA one bus away
+    private static final String[] OBA_BUSTIME_URL ={
+            "http://bustime.mta.info/api/where/stops-for-route/MTABC_",
+            "http://bustime.mta.info/api/where/stops-for-route/MTA NYCT_",
+            "http://bustime.mta.info/api/where/stops-for-route/MTA_"
+    };
+
+    private static final String STOPS_FOR_ROUTH =
+            "stops-for-route/";
+    private static final String JSON_FORMAT = ".json";
 
     /**
      * Builds the URL used to talk to the MTA BUS API using a few parameter
@@ -50,6 +66,29 @@ public final class NetworkUtilities {
     }
 
     /**
+     * Builds the URL used to talk to the ONE BUS AWAY API
+     * @param route the bus route number(ex:Q18)
+     * @return a URL array of size 3, because there is 3 different agency, we need to have 3 url to check
+     */
+    public static URL[] oneBusAwayBuildUrl(String route){
+        URL[] returnURL = new URL[3];
+        for (int i = 0; i < 3; i++){
+            String newOBAUrl = OBA_BUSTIME_URL[i] + route + JSON_FORMAT;
+            Uri buildOBAuri = Uri.parse(newOBAUrl).buildUpon()
+                    .appendQueryParameter(api_key, API_KEY)
+                    .build();
+            URL url = null;
+            try{
+                url = new URL(buildOBAuri.toString());
+            } catch (MalformedURLException e){
+                e.printStackTrace();
+            }
+            returnURL[i] = url;
+        }
+        return returnURL;
+    }
+
+    /**
      * This method returns the entire result from the HTTP response.
      * @param url The URL to fetch the HTTP response from..
      * @return the contents of the HTTP response.
@@ -59,6 +98,11 @@ public final class NetworkUtilities {
         HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
         try{
             InputStream in = urlConnection.getInputStream();
+            if (urlConnection.getResponseCode() != HttpURLConnection.HTTP_OK){
+                throw new IOException(urlConnection.getResponseMessage() +
+                ":errorchecking: with " +
+                url);
+            }
             Scanner scanner = new Scanner(in);
             scanner.useDelimiter("\\A");
             boolean hasInput = scanner.hasNext();
@@ -77,10 +121,10 @@ public final class NetworkUtilities {
      * @param item
      * @return
      */
-    public static TimeInfo getSpecificItem(String result,String item){
+    public static List<TimeInfo> getSpecificItem(String result,String item){
         TimeInfo timeInfoObject = new TimeInfo();
+        ArrayList<TimeInfo> stopsTimeInfo = new ArrayList<>();
         try{
-            String[] retrievedBusinfo = new String[6];
             JSONObject jsonObject = new JSONObject(result);
             Log.v(TAG,"json ojbect0: " + jsonObject);
             JSONObject siriJsonObject = jsonObject.getJSONObject("Siri");
@@ -99,72 +143,174 @@ public final class NetworkUtilities {
                     JSONObject otherErrorJsonObject = errorConditionJsonObject.getJSONObject("OtherError");
                     timeInfoObject.setFail(false);
                     timeInfoObject.setErrorMessage(otherErrorJsonObject.getString("ErrorText"));
-                    return timeInfoObject;
+                    stopsTimeInfo.add(timeInfoObject);
+                    return stopsTimeInfo;
                 }else{
                     timeInfoObject.setFail(false);
-                    return timeInfoObject;
+                    stopsTimeInfo.add(timeInfoObject);
+                    return stopsTimeInfo;
                 }
             }
 
             JSONArray monitorStopVisitJsonArray = stopMonitoringDeliveryJsonObject.getJSONArray("MonitoredStopVisit");
-            Log.v(TAG,"json ojbect5: " + monitorStopVisitJsonArray);
-            JSONObject monitoredVehicleJourneyJsonObject = monitorStopVisitJsonArray.getJSONObject(0);
-            Log.v(TAG,"json ojbect6: " + monitoredVehicleJourneyJsonObject);
-            JSONObject monitoredVehicleJourneyJsonObject1 = monitoredVehicleJourneyJsonObject.getJSONObject("MonitoredVehicleJourney");
-            Log.v(TAG,"json ojbect7: " + monitoredVehicleJourneyJsonObject1);
-            if (monitoredVehicleJourneyJsonObject1.has("OriginAimedDepartureTime")){
-                retrievedBusinfo[3] = monitoredVehicleJourneyJsonObject1.getString("OriginAimedDepartureTime");
-                timeInfoObject.setOriginAimedDepartureTime(monitoredVehicleJourneyJsonObject1.getString("OriginAimedDepartureTime"));
-            }else{
-                timeInfoObject.setOriginAimedDepartureTime("NoOriginAimedDepartureTime");
-                retrievedBusinfo[3] = "NoOriginAimedDepartureTime";
+            // if monitorStopVIsitJsonArray == 0 then there is no track service
+            if (monitorStopVisitJsonArray.length() == 0){
+                timeInfoObject.setFail(false);
+                timeInfoObject.setErrorMessage("We are not tracking any buses to this stop at this time. check back later for an upate.");
+                stopsTimeInfo.add(timeInfoObject);
+                return stopsTimeInfo;
             }
-            retrievedBusinfo[4] = monitoredVehicleJourneyJsonObject1.getString("PublishedLineName");
-            timeInfoObject.setPublishedLineName(monitoredVehicleJourneyJsonObject1.getString("PublishedLineName"));
-            Log.v("q18tag","json ojbect8: " + retrievedBusinfo[4]);
+            //loop through bus time info
+            for (int i = 0; i < monitorStopVisitJsonArray.length(); i++){
+                TimeInfo stopTimeInfo = new TimeInfo();
 
-            JSONObject monitoredCallJsonObject = monitoredVehicleJourneyJsonObject1.getJSONObject("MonitoredCall");
+                JSONObject monitoredVehicleJourneyJsonObject = monitorStopVisitJsonArray.getJSONObject(i);
+                JSONObject monitoredVehicleJourneyJsonObject1 = monitoredVehicleJourneyJsonObject.getJSONObject("MonitoredVehicleJourney");
+                if (monitoredVehicleJourneyJsonObject1.has("OriginAimedDepartureTime")){
+                    stopTimeInfo.setOriginAimedDepartureTime(monitoredVehicleJourneyJsonObject1.getString("OriginAimedDepartureTime"));
+                }else{
+                    stopTimeInfo.setOriginAimedDepartureTime("NoOriginAimedDepartureTime");
+                }
+                stopTimeInfo.setPublishedLineName(monitoredVehicleJourneyJsonObject1.getString("PublishedLineName"));
 
-            retrievedBusinfo[0] = monitoredCallJsonObject.getString("StopPointName");
-            timeInfoObject.setStopPointName(monitoredCallJsonObject.getString("StopPointName"));
-            if (monitoredCallJsonObject.has("ArrivalProximityText")){
-                retrievedBusinfo[2] = monitoredCallJsonObject.getString("ArrivalProximityText");
-                timeInfoObject.setArrivalProximityText(monitoredCallJsonObject.getString("ArrivalProximityText"));
-            }else{
-                timeInfoObject.setArrivalProximityText("can not track distance now");
-                retrievedBusinfo[2] = "can not track distance now";
+                JSONObject monitoredCallJsonObject = monitoredVehicleJourneyJsonObject1.getJSONObject("MonitoredCall");
+
+                stopTimeInfo.setStopPointName(monitoredCallJsonObject.getString("StopPointName"));
+                if (monitoredCallJsonObject.has("ArrivalProximityText")){
+                    stopTimeInfo.setArrivalProximityText(monitoredCallJsonObject.getString("ArrivalProximityText"));
+                }else{
+                    stopTimeInfo.setArrivalProximityText("can not track distance now");
+                }
+
+                //check if the return object has ExpectedArrivalTime, if no then doesn't need to calculate the remain time
+                if (monitoredCallJsonObject.has("ExpectedArrivalTime")){
+                    stopTimeInfo.setExpectedArrivalTime(monitoredCallJsonObject.getString("ExpectedArrivalTime"));
+                } else{
+                    stopTimeInfo.setExpectedArrivalTime("NoExpectedItem");
+                }
+                Iterator<String> keys = monitoredCallJsonObject.keys();
+
+                JSONObject distanceJsonObject = monitoredCallJsonObject.getJSONObject("Extensions");
+                JSONObject presentableDistanceJsonObject = distanceJsonObject.getJSONObject("Distances");
+                if (presentableDistanceJsonObject.has("PresentableDistance")){
+                    stopTimeInfo.setPresentableDistance( presentableDistanceJsonObject.getString("PresentableDistance"));
+                    stopTimeInfo.setStopsFromCall(presentableDistanceJsonObject.getString("PresentableDistance"));
+                } else{
+                    stopTimeInfo.setPresentableDistance("NoNumberOfStopsAway");
+                }
+
+                stopsTimeInfo.add(stopTimeInfo);
             }
+            return stopsTimeInfo;
 
-            //check if the return object has ExpectedArrivalTime, if no then doesn't need to calculate the remain time
-            if (monitoredCallJsonObject.has("ExpectedArrivalTime")){
-                timeInfoObject.setExpectedArrivalTime(monitoredCallJsonObject.getString("ExpectedArrivalTime"));
-                retrievedBusinfo[1] = monitoredCallJsonObject.getString("ExpectedArrivalTime");
-            } else{
-                timeInfoObject.setExpectedArrivalTime("NoExpectedItem");
-                retrievedBusinfo[1]  ="NoExpectedItem";
-            }
-            Iterator<String> keys = monitoredCallJsonObject.keys();
-
-            JSONObject distanceJsonObject = monitoredCallJsonObject.getJSONObject("Extensions");
-            JSONObject presentableDistanceJsonObject = distanceJsonObject.getJSONObject("Distances");
-            if (presentableDistanceJsonObject.has("PresentableDistance")){
-                retrievedBusinfo[5] = presentableDistanceJsonObject.getString("PresentableDistance");
-                timeInfoObject.setPresentableDistance( presentableDistanceJsonObject.getString("PresentableDistance"));
-                timeInfoObject.setStopsFromCall(presentableDistanceJsonObject.getString("PresentableDistance"));
-                Log.d("jsonkey","json key!!!： " + presentableDistanceJsonObject.getString("PresentableDistance"));
-                Log.d("jsonkey","json key!!!： " + presentableDistanceJsonObject.getString("StopsFromCall"));
-            } else{
-                retrievedBusinfo[5]  ="NoNumberOfStopsAway";
-                timeInfoObject.setPresentableDistance("NoNumberOfStopsAway");
-            }
-
-            return timeInfoObject;
         } catch(JSONException e){
             e.printStackTrace();
+            timeInfoObject.setFail(false);
+            timeInfoObject.setErrorMessage("Sorry, We can't track the bus now");
         }
         return null;
 
     }
 
+    /**
+     * read info from json
+     * @param result
+     * @return
+     */
+    public static BusDirection getStopListForRoute(String result){
+        BusDirection busDirection = new BusDirection();
+        ArrayList<StopsForRoute> stopsForRouteList0 = new ArrayList<>();
+        ArrayList<StopsForRoute> stopsForRouteList1 = new ArrayList<>();
+        try{
+            JSONObject rootJsonObject = new JSONObject(result);
+            String code = rootJsonObject.getString("code");
+            /**if code does not equal to 200 then something went wrong(ex incorrect route number), display a error message and don't let it crash the app
+            *
+             **/
+            if (!code.equals("200")){
+                StopsForRoute errorStop = new StopsForRoute();
+                errorStop.setId("error");
+                stopsForRouteList0.add(errorStop);
+                stopsForRouteList1.add(errorStop);
+                busDirection.setDirection0(stopsForRouteList0);
+                busDirection.setDirection1(stopsForRouteList1);
+                Log.i("error checking: " , "handle error success");
+                return busDirection;
+            }
+            JSONObject dataJsonObject = rootJsonObject.getJSONObject("data");
+            JSONArray stopGroupingsJsonObject = dataJsonObject.getJSONArray("stopGroupings");
+            JSONObject stopGoupingsJsonObject1 = stopGroupingsJsonObject.getJSONObject(0);
+            JSONArray stopGroupsJsonObject = stopGoupingsJsonObject1.getJSONArray("stopGroups");
+            //stopGroups sub object 1
+            JSONObject stopGroupsSubObject0 = stopGroupsJsonObject.getJSONObject(0);
+            String id = stopGroupsSubObject0.getString("id");
+            Log.i("json array!!!", "json array: " + id);
+            JSONObject nameJsonObject = stopGroupsSubObject0.getJSONObject("name");
+
+            //direction
+            String name = nameJsonObject.getString("name");
+            Log.i("json array!!!", "json array: " + name);
+            JSONArray stopIdsJsonArray = stopGroupsSubObject0.getJSONArray("stopIds");
+
+            //stop id
+            for (int i = 0; i< stopIdsJsonArray.length(); i++){
+                StopsForRoute stop = new StopsForRoute();
+                String stopIds = stopIdsJsonArray.getString(i);
+                Log.i("json array!!!", "json array: " + stopIds);
+                stop.setId(stopIds);
+                stop.setBusDirection(nameJsonObject.getString("name"));
+                stopsForRouteList0.add(stop);
+            }
+
+            // stopGroups sub object 2
+            JSONObject stopGroupsSubObject1 = stopGroupsJsonObject.getJSONObject(1);
+            String id2 = stopGroupsSubObject1.getString("id");
+            Log.i("json array!!!", "json array: " + id2);
+            JSONObject nameJsonObject2 = stopGroupsSubObject1.getJSONObject("name");
+            String name2= nameJsonObject2.getString("name");
+            Log.i("json array!!!", "json array: " + name2);
+            JSONArray stopIdsJsonArray2 = stopGroupsSubObject1.getJSONArray("stopIds");
+
+            for (int i = 0; i< stopIdsJsonArray2.length(); i++){
+                StopsForRoute stop = new StopsForRoute();
+                String stopIds = stopIdsJsonArray2.getString(i);
+                Log.i("json array!!!", "json array: " + stopIds);
+                stop.setId(stopIds);
+                stop.setBusDirection(nameJsonObject2.getString("name"));
+                stopsForRouteList1.add(stop);
+            }
+
+            JSONArray stopsJsonArray = dataJsonObject.getJSONArray("stops");
+            for (int i = 0; i < stopsJsonArray.length(); i++){
+                JSONObject stopObject = stopsJsonArray.getJSONObject(i);
+                String stopid = stopObject.getString("id");
+                for (int j = 0; j < stopsForRouteList0.size(); j++){
+                    StopsForRoute stop = stopsForRouteList0.get(j);
+                    if (stopid.equals(stop.getId())){
+                        stop.setStopCode(stopObject.getString("code"));
+                        stop.setIntersections(stopObject.getString("name"));
+                        stopsForRouteList0.set(j, stop);
+                    }
+                }
+                for (int j = 0; j < stopsForRouteList1.size(); j++){
+                    StopsForRoute stop = stopsForRouteList1.get(j);
+                    if (stopid.equals(stop.getId())){
+                        stop.setStopCode(stopObject.getString("code"));
+                        stop.setIntersections(stopObject.getString("name"));
+                        stopsForRouteList1.set(j, stop);
+                    }
+                }
+            }
+
+            busDirection.setDirection0(stopsForRouteList0);
+            busDirection.setDirection1(stopsForRouteList1);
+
+
+        } catch (JSONException e){
+            e.printStackTrace();
+        }
+
+        return busDirection;
+    }
 
 }

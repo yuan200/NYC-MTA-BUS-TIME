@@ -11,25 +11,25 @@
         android:id="@+id/save_group_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="Enter a name"/>
+        android:hint="Enter a name(optional)"/>
 
     <EditText
         android:id="@+id/save_stop_code1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="Enter a bus stop code"/>
+        android:hint="Enter a bus stop code(must)"/>
 
     <EditText
         android:id="@+id/save_stop_code2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="Enter a bus stop code"/>
+        android:hint="Enter a bus stop code(optional)"/>
 
     <EditText
         android:id="@+id/save_stop_code3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="Enter a bus stop code"/>
+        android:hint="Enter a bus stop code(optional)"/>
 
     <Button
         android:id="@+id/save_group_button"

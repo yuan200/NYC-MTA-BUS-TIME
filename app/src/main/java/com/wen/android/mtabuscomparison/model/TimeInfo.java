@@ -1,7 +1,5 @@
 package com.wen.android.mtabuscomparison.model;
 
-import java.util.concurrent.TimeUnit;
-
 /**
  * Created by yuan on 4/11/2017.
  */
@@ -14,11 +12,11 @@ public class TimeInfo {
     private String mPresentableDistance;
     private String mPublishedLineName;
     private String mStopsFromCall;
-    private Boolean mIsFail;
+    private Boolean mIsSuccess;
     private String mErrorMessage;
 
     public TimeInfo(){
-        mIsFail = true;
+        mIsSuccess = true;
         mErrorMessage = "error";
     }
 
@@ -87,10 +85,10 @@ public class TimeInfo {
     }
 
     public Boolean getFail() {
-        return mIsFail;
+        return mIsSuccess;
     }
 
     public void setFail(Boolean fail) {
-        mIsFail = fail;
+        mIsSuccess = fail;
     }
 }

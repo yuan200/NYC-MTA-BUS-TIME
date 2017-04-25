@@ -3,4 +3,6 @@
     <string name="title_search">Search</string>
     <string name="title_favorite">Favorite</string>
     <string name="title_nearby">About</string>
+    <string name="search">Search</string>
+    <string name="clear_search">Clear Search</string>
 </resources>
