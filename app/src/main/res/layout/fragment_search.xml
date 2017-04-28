@@ -15,6 +15,7 @@
                     android:id="@+id/search_tips"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:padding="4dp"
                     android:text="TIP: Enter a bus stop code or bus route, or try one of the examples below:\n"/>
 
             <TextView
@@ -23,6 +24,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/search_tips"
                 android:fontFamily="sans-serif"
+                android:padding="4dp"
                 android:text="Stops:"/>
 
             <TextView
@@ -31,6 +33,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/hints_stops"
                 android:layout_alignParentLeft="true"
+                android:padding="4dp"
                 android:text="550570"/>
              <TextView
                 android:id="@+id/hints_stop_2"
@@ -46,6 +49,7 @@
                 android:layout_below="@+id/hints_stops"
                 android:layout_alignParentRight="true"
                 android:layout_alignBaseline="@+id/hints_stop_1"
+                android:padding="4dp"
                 android:text="551575"/>
 
               <TextView
@@ -53,6 +57,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/hints_stop_1"
+                android:padding="4dp"
                 android:text="\nRoutes:"/>
 
             <TextView
@@ -61,6 +66,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/hints_routes"
                 android:layout_alignParentLeft="true"
+                android:padding="4dp"
                 android:text="Q18"/>
 
              <TextView
@@ -75,14 +81,15 @@
                 android:id="@+id/hints_route_3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/hints_stops"
                 android:layout_alignParentRight="true"
                 android:layout_alignBaseline="@+id/hints_route_1"
+                android:padding="4dp"
                 android:text="M1"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/hints_route_3"
+                android:layout_below="@+id/hints_route_1"
+                android:padding="4dp"
                 android:text="save two or more stops in favorite to track multiple stops at the same time"/>
         </RelativeLayout>
 

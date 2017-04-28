@@ -13,9 +13,9 @@ public class BusContract {
         public static final String COLUMN_BUS_STOP_CODE = "busStopCode";
         public static final String COLUMN_BUS_STOP_CODE2 = "busStopCode2";
         public static final String COLUMN_BUS_STOP_CODE3 = "busStopCode3";
-        public static final String COLUMN_BUS_STOP_GROUP = "groupName";
-        public static final String COLUMN_BUS_NAME = "busName";
         public static final String COLUMN_BUS_LINE = "busLine";
+        public static final String COLUMN_BUS_NAME = "busName";
+        public static final String COLUMN_BUS_STOP_GROUP = "groupName";
         public static final String  COLUMN_TIMESTAMP = "timestamp";
     }
 }

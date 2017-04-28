@@ -12,7 +12,7 @@ public class BusDbHelper extends SQLiteOpenHelper {
     //The database name
     private static final String DATABASE_NAME = "buslist.db";
     //if you change the database schema, you must increment the database version
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     public BusDbHelper(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -26,12 +26,13 @@ public class BusDbHelper extends SQLiteOpenHelper {
                 BusContract.BusEntry.COLUMN_BUS_STOP_CODE + " TEXT NOT NULL, " +
                 BusContract.BusEntry.COLUMN_BUS_STOP_CODE2 + " TEXT, " +
                 BusContract.BusEntry.COLUMN_BUS_STOP_CODE3 + " TEXT, " +
+                BusContract.BusEntry.COLUMN_BUS_LINE + " TEXT, " +
+                BusContract.BusEntry.COLUMN_BUS_NAME + " TEXT, " +
                 BusContract.BusEntry.COLUMN_BUS_STOP_GROUP + " TEXT, " +
                 BusContract.BusEntry.COLUMN_TIMESTAMP + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
                 "); ";
 
         sqLiteDatabase.execSQL(SQL_CREATE_BUSTLIST_TABLE);
-        //sqLiteDatabase.execSQL(SQL_CREATE_SINGLE_BUSTLIST_TABLE);
         //insert sample data
         sqLiteDatabase.execSQL("INSERT INTO "+ BusContract.BusEntry.TABLE_NAME + " (" +
                 BusContract.BusEntry.COLUMN_BUS_STOP_CODE + ", " +
@@ -48,7 +49,6 @@ public class BusDbHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         //drop the table and create a new one, if you change the database version
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + BusContract.BusEntry.TABLE_NAME);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + BusContract.BusEntry.TABLE_NAME_SINGLE_BUS);
         onCreate(sqLiteDatabase);
     }
 }
