@@ -1,8 +1,11 @@
 package com.wen.android.mtabuscomparison;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -14,10 +17,16 @@ import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.wen.android.mtabuscomparison.handler.DatabaseHandler;
 import com.wen.android.mtabuscomparison.model.TimeInfo;
+import com.wen.android.mtabuscomparison.utilities.BusContract;
 import com.wen.android.mtabuscomparison.utilities.NetworkUtilities;
 
 import org.w3c.dom.Text;
@@ -36,6 +45,7 @@ import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
 public class SearchResultActivity extends AppCompatActivity {
 
     private TextView mBusTimeInfoView;
+    private MenuItem mFavoriteMenu;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private CardView mBusTimeCardview1;
     private CardView mBusTimeCardview2;
@@ -43,6 +53,10 @@ public class SearchResultActivity extends AppCompatActivity {
     private TextView mBusTimeTextview1;
     private TextView mBusTimeTextview2;
     private TextView mBusTimeTextview3;
+    private ArrayList<TimeInfo> mSaveForFavoriteList;
+    private final static String FAVORITE_CHECKED = "favorite_checked";
+    private final static String DATABASE_ROW_ID = "row_id";
+    private long mRowID;
     private static int textViewIndicator;
 
     @Override
@@ -50,6 +64,7 @@ public class SearchResultActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_result);
 
+        mSaveForFavoriteList = new ArrayList<>();
         mBusTimeCardview1 = (CardView)findViewById(R.id.bus_info_card1);
         mBusTimeCardview2 = (CardView)findViewById(R.id.bus_info_card2);
         mBusTimeCardview3 = (CardView)findViewById(R.id.bus_info_card3);
@@ -58,9 +73,12 @@ public class SearchResultActivity extends AppCompatActivity {
         mBusTimeTextview3 = (TextView)findViewById(R.id.bus_info_view_3);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.result_swipe_refresh_layout);
         mBusTimeInfoView = (TextView)findViewById(R.id.bus_info_view_1);
-        Date curDate = new Date();
+        mRowID = 9999999;
 
         final Intent intentThatStartedThisActivity = getIntent();
+        if (intentThatStartedThisActivity.hasExtra(DATABASE_ROW_ID)){
+            mRowID = Long.parseLong(intentThatStartedThisActivity.getStringExtra(DATABASE_ROW_ID));
+        }
         startBusTrackOperation(intentThatStartedThisActivity);
         mSwipeRefreshLayout.setOnRefreshListener(
                 new SwipeRefreshLayout.OnRefreshListener(){
@@ -70,6 +88,38 @@ public class SearchResultActivity extends AppCompatActivity {
                     }
                 }
         );
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.action_favorite, menu);
+        mFavoriteMenu = menu.findItem(R.id.action_favorite);
+        Intent intent = getIntent();
+        if (intent.hasExtra(FAVORITE_CHECKED)){
+            mFavoriteMenu.setChecked(true);
+            mFavoriteMenu.setIcon(R.drawable.ic_favorite_yellow_24dp);
+            Drawable drawable = mFavoriteMenu.getIcon();
+            drawable.setColorFilter(Color.YELLOW, PorterDuff.Mode.SRC_ATOP);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.action_favorite:
+                //item.setIcon(R.drawable.ic_favorite_black_24dp);
+                setFavorite(item);
+                if (!item.isChecked()){
+                    removeFromFavorite();
+                }else {
+                    addToFavorite();
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     /**
@@ -130,20 +180,38 @@ public class SearchResultActivity extends AppCompatActivity {
             Date strToDate;
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
             ArrayList<String> busLineName = new ArrayList<>();
-
-            TimeInfo errorChecking = stopsTimeInfo.get(0);
+            TimeInfo errorChecking;
             TimeInfo expectedTime;
-
+            TimeInfo saveForFavorite;
             incTextviewIndicator();
             TextView timeInfoView;
             Boolean isSameBusLine;
 
+            timeInfoView = getBusInfoView();
+            //if an android doens't connect to Internet, then sopsTimeInfo will be null
+            if(stopsTimeInfo == null){
+                timeInfoView.setText("Sorry, something went wrong, please try again later");
+                mSwipeRefreshLayout.setRefreshing(false);
+                return;
+            }
+            expectedTime = stopsTimeInfo.get(0);
+            errorChecking = stopsTimeInfo.get(0);
+            if(expectedTime.getFail() == false){
+                timeInfoView.setText(errorChecking.getErrorMessage());
+                mSwipeRefreshLayout.setRefreshing(false);
+                return;
+            }
+
+
             String boldText = stopsTimeInfo.get(0).getStopPointName();
+            saveForFavorite = new TimeInfo();
+            saveForFavorite.setStopNumber(stopsTimeInfo.get(0).getStopNumber());
+            saveForFavorite.setStopPointName(stopsTimeInfo.get(0).getStopPointName());
+            mSaveForFavoriteList.add(saveForFavorite);
             SpannableString str = new SpannableString(boldText);
             str.setSpan(new StyleSpan(Typeface.BOLD), 0, boldText.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
             str.setSpan(new ForegroundColorSpan(Color.BLUE),0 , boldText.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
             //timeInfoView.append(stopsTimeInfo.get(0).getStopPointName() + "\n");
-            timeInfoView = getBusInfoView();
             timeInfoView.append(str);
             timeInfoView.append("\n");
 
@@ -155,10 +223,6 @@ public class SearchResultActivity extends AppCompatActivity {
                 }
                  **/
                 expectedTime = stopsTimeInfo.get(i);
-                if(expectedTime.getFail() == false){
-                    timeInfoView.setText(errorChecking.getErrorMessage());
-                    return;
-                }
                 isSameBusLine = false;
                 for(String lineName:busLineName){
                     if (expectedTime.getPublishedLineName().equalsIgnoreCase(lineName)){
@@ -209,7 +273,6 @@ public class SearchResultActivity extends AppCompatActivity {
             }
 
             mSwipeRefreshLayout.setRefreshing(false);
-
         }
     }
 
@@ -246,5 +309,45 @@ public class SearchResultActivity extends AppCompatActivity {
 
     public int getTextviewIndicator(){
         return textViewIndicator;
+    }
+
+    public void addToFavorite(){
+        ContentValues cv = new ContentValues();
+        String stopCode = null;
+        DatabaseHandler db = new DatabaseHandler(this);
+        for (TimeInfo item : mSaveForFavoriteList){
+            String str = item.getStopNumber();
+            for (int i = 0; i < str.length(); i++){
+                if(Character.isDigit(str.charAt(i))){
+                    stopCode = str.substring(i,str.length());
+                    break;
+                }
+            }
+            cv.put(BusContract.BusEntry.COLUMN_BUS_STOP_CODE,stopCode);
+            cv.put(BusContract.BusEntry.COLUMN_BUS_STOP_GROUP,item.getStopPointName());
+        }
+        mRowID = db.insertToDatabase(cv);
+    }
+
+    public void removeFromFavorite(){
+        DatabaseHandler db = new DatabaseHandler(this);
+        Intent intent = getIntent();
+        db.deleteFromDatabase(mRowID);
+    }
+
+    /**
+     * sets the favorite icon, if the item is check then sets uncheck and change to responding icon
+     * @param item
+     */
+    public void setFavorite(MenuItem item){
+        if (item.isChecked()){
+            item.setChecked(false);
+            item.setIcon(R.drawable.ic_favorite_border_black_24dp);
+        }else {
+            item.setChecked(true);
+            item.setIcon(R.drawable.ic_favorite_black_24dp);
+            Drawable drawable = item.getIcon();
+            drawable.setColorFilter(Color.YELLOW, PorterDuff.Mode.SRC_ATOP);
+        }
     }
 }

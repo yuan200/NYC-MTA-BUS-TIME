@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -20,38 +19,35 @@ import android.widget.TextView;
 import com.wen.android.mtabuscomparison.R;
 import com.wen.android.mtabuscomparison.SaveComparison;
 import com.wen.android.mtabuscomparison.SearchResultActivity;
-import com.wen.android.mtabuscomparison.model.Buses;
 import com.wen.android.mtabuscomparison.model.Favorite;
-import com.wen.android.mtabuscomparison.model.TimeInfo;
 import com.wen.android.mtabuscomparison.utilities.BusContract;
 import com.wen.android.mtabuscomparison.utilities.BusDbHelper;
-import com.wen.android.mtabuscomparison.utilities.SwipeableRecyclerViewTouchListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This class represent the favorite tab where user can see their save bus
  */
 
-public class ComparisonFragment extends Fragment {
+public class FavoriteFragment extends Fragment {
     private FloatingActionButton fab;
     private SQLiteDatabase mDb;
     private Cursor mCursor;
     private RecyclerView mBusRecyclerView;
     private BusAdapter mAdapter;
+    private final static String FAVORITE_CHECKED = "favorite_checked";
+    private final static String DATABASE_ROW_ID = "row_id";
     List<Favorite> mFavorite = new ArrayList<>();
 
-    public ComparisonFragment(){
+    public FavoriteFragment(){
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View v = inflater.inflate(R.layout.fragment_comparison, container, false);
+        View v = inflater.inflate(R.layout.fragment_favorite, container, false);
         BusDbHelper dbHelper = new BusDbHelper(getContext());
         //get a reference to the mdb
         mDb = dbHelper.getWritableDatabase();
@@ -92,7 +88,7 @@ public class ComparisonFragment extends Fragment {
                 startActivity(intent);
             }
         });
-        updateUI();
+        //updateUI();
         return v;
     }
 
@@ -174,6 +170,8 @@ public class ComparisonFragment extends Fragment {
 
             Intent intent = new Intent(getActivity(), SearchResultActivity.class);
             intent.putExtra(Intent.EXTRA_TEXT,stopcodeArray);
+            intent.putExtra(FAVORITE_CHECKED,"favorite_check");
+            intent.putExtra(DATABASE_ROW_ID,mRowId.getText().toString());
             startActivity(intent);
 
         }
@@ -214,12 +212,7 @@ public class ComparisonFragment extends Fragment {
 
     private void updateUI(){
         List<Favorite> favorites = getBusStopCode();
-
-        if (mAdapter == null){
-            mAdapter = new BusAdapter(favorites);
-            mBusRecyclerView.setAdapter(mAdapter);
-        }else {
-            mAdapter.setFavorites(favorites);
-        }
+        mAdapter = new BusAdapter(favorites);
+        mBusRecyclerView.setAdapter(mAdapter);
     }
 }

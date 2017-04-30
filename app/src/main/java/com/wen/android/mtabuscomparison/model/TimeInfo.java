@@ -5,6 +5,7 @@ package com.wen.android.mtabuscomparison.model;
  */
 
 public class TimeInfo {
+    private String mStopNumber;
     private String mExpectedArrivalTime;
     private String mStopPointName;
     private String mArrivalProximityText;
@@ -18,6 +19,14 @@ public class TimeInfo {
     public TimeInfo(){
         mIsSuccess = true;
         mErrorMessage = "error";
+    }
+
+    public String getStopNumber() {
+        return mStopNumber;
+    }
+
+    public void setStopNumber(String stopNumber) {
+        mStopNumber = stopNumber;
     }
 
     public String getExpectedArrivalTime() {

@@ -126,15 +126,10 @@ public final class NetworkUtilities {
         ArrayList<TimeInfo> stopsTimeInfo = new ArrayList<>();
         try{
             JSONObject jsonObject = new JSONObject(result);
-            Log.v(TAG,"json ojbect0: " + jsonObject);
             JSONObject siriJsonObject = jsonObject.getJSONObject("Siri");
-            Log.v(TAG,"json ojbect1: " + siriJsonObject);
             JSONObject serveicDeliveryObject =siriJsonObject.getJSONObject("ServiceDelivery");
-            Log.v(TAG,"json ojbect2: " + serveicDeliveryObject);
             JSONArray stopMonitoringDelivery = serveicDeliveryObject.getJSONArray("StopMonitoringDelivery");
-            Log.v(TAG,"json ojbect3: " + stopMonitoringDelivery);
             JSONObject stopMonitoringDeliveryJsonObject = stopMonitoringDelivery.getJSONObject(0);
-            Log.v(TAG,"json ojbect4: " + stopMonitoringDeliveryJsonObject);
 
             // check if there are error
             if (stopMonitoringDeliveryJsonObject.has("ErrorCondition")){
@@ -187,6 +182,9 @@ public final class NetworkUtilities {
                     stopTimeInfo.setExpectedArrivalTime(monitoredCallJsonObject.getString("ExpectedArrivalTime"));
                 } else{
                     stopTimeInfo.setExpectedArrivalTime("NoExpectedItem");
+                }
+                if (monitoredCallJsonObject.has("StopPointRef")){
+                    stopTimeInfo.setStopNumber(monitoredCallJsonObject.getString("StopPointRef"));
                 }
                 Iterator<String> keys = monitoredCallJsonObject.keys();
 

@@ -5,4 +5,5 @@
     <string name="title_nearby">About</string>
     <string name="search">Search</string>
     <string name="clear_search">Clear Search</string>
+    <string name="favorite_check">favorite_check</string>
 </resources>
