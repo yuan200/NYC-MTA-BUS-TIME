@@ -1,5 +1,7 @@
 package com.wen.android.mtabuscomparison;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -9,6 +11,8 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.wen.android.mtabuscomparison.Fragment.AboutFragment;
 import com.wen.android.mtabuscomparison.Fragment.FavoriteFragment;
 import com.wen.android.mtabuscomparison.Fragment.SearchFragment;
@@ -16,6 +20,8 @@ import com.wen.android.mtabuscomparison.Fragment.SearchFragment;
 public class MainActivity extends AppCompatActivity {
 
     BottomNavigationView bottomNavigationView;
+
+    private static final int REQUEST_ERROR = 0;
 
     private ViewPager viewPager;
 
@@ -87,6 +93,26 @@ public class MainActivity extends AppCompatActivity {
 
         setupViewPager(viewPager);
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int errorCode = apiAvailability.isGooglePlayServicesAvailable(this);
+
+        if (errorCode != ConnectionResult.SUCCESS){
+            Dialog errorDialog = apiAvailability
+                    .getErrorDialog(this,errorCode, REQUEST_ERROR,
+                            new DialogInterface.OnCancelListener(){
+                                @Override
+                                public void onCancel(DialogInterface dialog) {
+                                    //leave if services are unavailable
+                                    finish();
+                                }
+                            });
+            errorDialog.show();
+        }
     }
 
     private void setupViewPager(ViewPager viewPager) {

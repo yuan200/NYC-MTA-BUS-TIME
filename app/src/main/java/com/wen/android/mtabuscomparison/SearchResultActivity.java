@@ -345,7 +345,7 @@ public class SearchResultActivity extends AppCompatActivity {
             item.setIcon(R.drawable.ic_favorite_border_black_24dp);
         }else {
             item.setChecked(true);
-            item.setIcon(R.drawable.ic_favorite_black_24dp);
+            item.setIcon(R.drawable.ic_favorite_yellow_24dp);
             Drawable drawable = item.getIcon();
             drawable.setColorFilter(Color.YELLOW, PorterDuff.Mode.SRC_ATOP);
         }

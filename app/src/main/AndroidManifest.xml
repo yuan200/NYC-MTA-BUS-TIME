@@ -3,6 +3,8 @@
           package="com.wen.android.mtabuscomparison">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <application
         android:allowBackup="true"
@@ -27,6 +29,9 @@
         <activity android:name=".RoutesViewActivity">
 
         </activity>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAD_Fu63u7w7_XJHcw8v7Xq9JIfEHow2ns"/>
     </application>
 
 </manifest>
