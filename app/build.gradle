@@ -7,8 +7,8 @@ android {
         applicationId "com.wen.android.mtabuscomparison"
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 7
-        versionName "0.0.0.6"
+        versionCode 9
+        versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -40,5 +40,7 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:25.3.1'
     compile 'com.google.android.gms:play-services-maps:11.0.2'
     compile 'com.google.android.gms:play-services-places:11.0.2'
+    compile 'com.google.android.gms:play-services-location:11.0.2'
+    compile 'com.readystatesoftware.sqliteasset:sqliteassethelper:+'
     testCompile 'junit:junit:4.12'
 }

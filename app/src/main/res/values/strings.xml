@@ -2,7 +2,7 @@
     <string name="app_name">MTA BUS COMPARISON</string>
     <string name="title_search">Search</string>
     <string name="title_favorite">Favorite</string>
-    <string name="title_nearby">Nearby</string>
+    <string name="title_nearby">Help</string>
     <string name="search">Search</string>
     <string name="clear_search">Clear Search</string>
     <string name="favorite_check">favorite_check</string>

@@ -12,6 +12,7 @@ public class TimeInfo {
     private String mOriginAimedDepartureTime;
     private String mPresentableDistance;
     private String mPublishedLineName;
+    private String mDestinationName;
     private String mStopsFromCall;
     private Boolean mIsSuccess;
     private String mErrorMessage;
@@ -75,6 +76,14 @@ public class TimeInfo {
 
     public void setPublishedLineName(String publishedLineName) {
         mPublishedLineName = publishedLineName;
+    }
+
+    public String getDestinationName() {
+        return mDestinationName;
+    }
+
+    public void setDestinationName(String destinationName) {
+        mDestinationName = destinationName;
     }
 
     public String getStopsFromCall() {

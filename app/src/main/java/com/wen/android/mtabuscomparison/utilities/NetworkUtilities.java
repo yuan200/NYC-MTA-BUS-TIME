@@ -167,6 +167,7 @@ public final class NetworkUtilities {
                     stopTimeInfo.setOriginAimedDepartureTime("NoOriginAimedDepartureTime");
                 }
                 stopTimeInfo.setPublishedLineName(monitoredVehicleJourneyJsonObject1.getString("PublishedLineName"));
+                stopTimeInfo.setDestinationName(monitoredVehicleJourneyJsonObject1.getString("DestinationName"));
 
                 JSONObject monitoredCallJsonObject = monitoredVehicleJourneyJsonObject1.getJSONObject("MonitoredCall");
 

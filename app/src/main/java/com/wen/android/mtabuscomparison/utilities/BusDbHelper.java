@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.content.res.Resources;
 import android.util.Log;
 
+import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,19 +19,22 @@ import java.nio.charset.StandardCharsets;
  * Created by yuan on 4/11/2017.
  */
 
-public class BusDbHelper extends SQLiteOpenHelper {
+public class BusDbHelper extends SQLiteAssetHelper {
     //The database name
     private static final String DATABASE_NAME = "buslist.db";
     //if you change the database schema, you must increment the database version
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 5;
 
     //a handle to the application's resources
     private String output;
 
     public BusDbHelper(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        setForcedUpgrade();
     }
 
+
+    /**
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         //Create a table to hold buslist data
@@ -80,12 +85,14 @@ public class BusDbHelper extends SQLiteOpenHelper {
 
     }
 
+     **/
+
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         //drop the table and create a new one, if you change the database version
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + BusContract.BusEntry.TABLE_NAME);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + BusContract.BusEntry.TABLE_NAME_ALL_BUS);
-        onCreate(sqLiteDatabase);
+        //sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + BusContract.BusEntry.TABLE_NAME);
+        //sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + BusContract.BusEntry.TABLE_NAME_ALL_BUS);
+        //onCreate(sqLiteDatabase);
     }
 
     /**
@@ -101,9 +108,11 @@ public class BusDbHelper extends SQLiteOpenHelper {
              while (myLine != null){
                  String[] array1 = myLine.split(",");
                  for (int i = 0; i < array1.length; i++){
+                     /**
                      array1[i] = array1[i].replaceAll("\"","");
                      array1[i] = array1[i].replaceAll("\\s+","");
                      array1[i] = array1[i].replaceAll("/","");
+                      **/
                      array1[i] = array1[i].replaceAll("'","");
                  }
                  sqLiteDatabase.execSQL("INSERT INTO " + BusContract.BusEntry.TABLE_NAME_ALL_BUS + " (" +

@@ -23,6 +23,7 @@ import com.wen.android.mtabuscomparison.model.Favorite;
 import com.wen.android.mtabuscomparison.utilities.BusContract;
 import com.wen.android.mtabuscomparison.utilities.BusDbHelper;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -129,6 +130,14 @@ public class FavoriteFragment extends Fragment {
             mFavoriteList.add(favorite);
         }
         mFavorite = mFavoriteList;
+        /**
+        File dir = getActivity().getFilesDir();
+        boolean deleted =getActivity().deleteFile("buslist.db");
+        File file = new File(dir, "assets/databases/buslist.db");
+        if (deleted){
+        } else
+
+         **/
         return mFavoriteList;
     }
 
@@ -161,7 +170,6 @@ public class FavoriteFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            Log.d("onclick recycler view: " , "clicked");
             String[] stopcodeArray = new String[3];
             //get the bus code from the user input
             stopcodeArray[0] = mStopCodeView1.getText().toString();

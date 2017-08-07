@@ -30,7 +30,6 @@ import com.wen.android.mtabuscomparison.utilities.BusDbHelper;
  */
 
 public class AboutFragment extends Fragment {
-    private Button mMTA_Bus_Time_link;
     private Button mSendEmail;
     private static final String TAG_EXCEPTION = "exception error";
     private SQLiteDatabase mDb;
@@ -43,25 +42,10 @@ public class AboutFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fragment_about, container, false);
         BusDbHelper dbHelper = new BusDbHelper(getContext());
         mDb = dbHelper.getReadableDatabase();
-        View v = inflater.inflate(R.layout.fragment_about, container, false);
-        mMTA_Bus_Time_link = (Button)v.findViewById(R.id.mta_bus_time_link);
         mSendEmail = (Button)v.findViewById(R.id.send_email);
-        mMTA_Bus_Time_link.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int PLACE_PICKER_REQUEST =1;
-                PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-                try{
-                    startActivityForResult(builder.build(getActivity()),PLACE_PICKER_REQUEST);
-                }catch (GooglePlayServicesRepairableException e){
-                    Log.e(TAG_EXCEPTION, "GooglePlayServicesRepairableException");
-                }catch (GooglePlayServicesNotAvailableException e){
-                    Log.e(TAG_EXCEPTION, "GooglePlayServicesNotAvailableException");
-                }
-            }
-        });
         mSendEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -78,6 +62,7 @@ public class AboutFragment extends Fragment {
         return v;
     }
 
+    /**
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         boolean isBusStation = false;
@@ -150,4 +135,5 @@ public class AboutFragment extends Fragment {
                     .show();
         }
     }
+    **/
 }

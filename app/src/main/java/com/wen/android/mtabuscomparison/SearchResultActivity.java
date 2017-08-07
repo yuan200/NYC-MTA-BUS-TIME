@@ -11,9 +11,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
-import android.text.Spannable;
 import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
@@ -22,14 +20,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.wen.android.mtabuscomparison.handler.DatabaseHandler;
 import com.wen.android.mtabuscomparison.model.TimeInfo;
 import com.wen.android.mtabuscomparison.utilities.BusContract;
 import com.wen.android.mtabuscomparison.utilities.NetworkUtilities;
-
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.net.URL;
@@ -39,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-import static android.icu.lang.UProperty.INT_START;
 import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
 
 public class SearchResultActivity extends AppCompatActivity {
@@ -232,7 +226,7 @@ public class SearchResultActivity extends AppCompatActivity {
                 if (isSameBusLine != true){
                     busLineName.add(expectedTime.getPublishedLineName());
                 }
-                timeInfoView.append(expectedTime.getPublishedLineName() + "\n");
+                timeInfoView.append(expectedTime.getPublishedLineName() + " " + expectedTime.getDestinationName()+"\n");
                 if (!expectedTime.getExpectedArrivalTime().equals("NoExpectedItem")){
 
                     try{
