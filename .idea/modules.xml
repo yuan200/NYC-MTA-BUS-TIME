@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/MTABUSCOMPARISON.iml" filepath="$PROJECT_DIR$/MTABUSCOMPARISON.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MTA-BUS-TIME-COMPARISON.iml" filepath="$PROJECT_DIR$/.idea/modules/MTA-BUS-TIME-COMPARISON.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/MTA-BUS-TIME-COMPARISON.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/MTA-BUS-TIME-COMPARISON.app.iml" />
     </modules>
   </component>
 </project>
