@@ -1,13 +1,12 @@
 package com.wen.android.mtabuscomparison;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.ButtonBarLayout;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.appcompat.widget.ButtonBarLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,14 +17,10 @@ import android.widget.TextView;
 import com.github.aakira.expandablelayout.ExpandableLinearLayout;
 import com.wen.android.mtabuscomparison.model.BusDirection;
 import com.wen.android.mtabuscomparison.model.StopsForRoute;
-import com.wen.android.mtabuscomparison.model.TimeInfo;
 import com.wen.android.mtabuscomparison.utilities.NetworkUtilities;
-
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 public class RoutesViewActivity extends AppCompatActivity {

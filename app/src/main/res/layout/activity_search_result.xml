@@ -8,7 +8,7 @@
     android:padding="16dp"
     tools:context="com.wen.android.mtabuscomparison.SearchResultActivity">
 
-    <android.support.v4.widget.SwipeRefreshLayout
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/result_swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -24,7 +24,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-            <android.support.v7.widget.CardView
+            <androidx.cardview.widget.CardView
                 android:id="@+id/bus_info_card1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -40,9 +40,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
-            </android.support.v7.widget.CardView>
+            </androidx.cardview.widget.CardView>
 
-            <android.support.v7.widget.CardView
+            <androidx.cardview.widget.CardView
                 android:id="@+id/bus_info_card2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -59,9 +59,9 @@
                     android:textSize="18sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
-            </android.support.v7.widget.CardView>
+            </androidx.cardview.widget.CardView>
 
-            <android.support.v7.widget.CardView
+            <androidx.cardview.widget.CardView
                 android:id="@+id/bus_info_card3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -82,13 +82,13 @@
                     />
 
 
-            </android.support.v7.widget.CardView>
+            </androidx.cardview.widget.CardView>
             </LinearLayout>
 
 
         </ScrollView>
 
-    </android.support.v4.widget.SwipeRefreshLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 
 

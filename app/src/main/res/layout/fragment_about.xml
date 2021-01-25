@@ -9,7 +9,7 @@
         android:text=""/>
 
 
-<android.support.v7.widget.CardView
+<androidx.cardview.widget.CardView
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -102,7 +102,7 @@
                 android:padding="4dp"
                 android:text="save two or more stops in favorite to track multiple stops at the same time"/>
         </RelativeLayout>
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
     <Button
         android:id="@+id/send_email"
         android:layout_width="wrap_content"

@@ -1,7 +1,7 @@
 package com.wen.android.mtabuscomparison.model;
 
 import android.location.Location;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * Created by yuan on 4/19/2017.
