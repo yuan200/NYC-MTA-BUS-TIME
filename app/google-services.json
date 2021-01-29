@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "585666660041",
+    "firebase_url": "https://mtabuscomparison.firebaseio.com",
+    "project_id": "mtabuscomparison",
+    "storage_bucket": "mtabuscomparison.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:585666660041:android:b180947503b0c483",
+        "android_client_info": {
+          "package_name": "com.wen.android.mtabuscomparison"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "585666660041-i8ps6f4arfbomiqjstc1tc7rt39vj450.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wen.android.mtabuscomparison",
+            "certificate_hash": "0a775ac566ed602adfdbef6a37dd2f605be39207"
+          }
+        },
+        {
+          "client_id": "585666660041-cj5dev50oks5kjbs7p6qhs6dd5dqvgf2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAd7Uyb50p3qXB0eI6dQou0O4G3HqMlgNQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "585666660041-cj5dev50oks5kjbs7p6qhs6dd5dqvgf2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

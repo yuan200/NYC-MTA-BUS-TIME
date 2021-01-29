@@ -1,21 +1,17 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content">
     <androidx.cardview.widget.CardView
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/item_card_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:layout_margin="3dp"
+        android:layout_margin="1dp"
         card_view:cardBackgroundColor="@color/colorTransparent" >
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="10dp">
 
             <ImageView
                 android:id="@+id/item_bus_image"
@@ -32,12 +28,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif"
-                android:textSize="35dp"
+                android:textSize="22dp"
                 android:visibility="visible"
                 android:layout_toRightOf="@+id/item_bus_image"
                 android:layout_alignParentTop="true"
                 android:text="good night"/>
 
+            <TextView
+                android:id="@+id/item_routes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/item_read_group"
+                android:layout_alignLeft="@+id/item_read_group"/>
             <TextView
                 android:id="@+id/item_read_stop_code_1"
                 android:layout_width="match_parent"
@@ -69,5 +71,3 @@
 
     </androidx.cardview.widget.CardView>
 
-
-</LinearLayout>

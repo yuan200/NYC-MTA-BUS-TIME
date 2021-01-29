@@ -1,0 +1,38 @@
+Index: app/src/main/java/com/wen/android/mtabuscomparison/utilities/BusDbHelper.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.wen.android.mtabuscomparison.utilities;\n\nimport android.content.Context;\nimport android.content.res.Resources;\nimport android.database.sqlite.SQLiteDatabase;\nimport android.database.sqlite.SQLiteOpenHelper;\nimport android.content.res.Resources;\nimport android.util.Log;\n\nimport com.readystatesoftware.sqliteasset.SQLiteAssetHelper;\n\nimport java.io.BufferedReader;\nimport java.io.IOException;\nimport java.io.InputStream;\nimport java.io.InputStreamReader;\nimport java.nio.charset.StandardCharsets;\n\n/**\n * Created by yuan on 4/11/2017.\n */\n\npublic class BusDbHelper extends SQLiteAssetHelper {\n    //The database name\n    private static final String DATABASE_NAME = \"buslist.db\";\n    //if you change the database schema, you must increment the database version\n    private static final int DATABASE_VERSION = 5;\n\n    //a handle to the application's resources\n    private String output;\n\n    public BusDbHelper(Context context){\n        super(context, DATABASE_NAME, null, DATABASE_VERSION);\n        setForcedUpgrade();\n    }\n\n\n    /**\n    @Override\n    public void onCreate(SQLiteDatabase sqLiteDatabase) {\n        //Create a table to hold buslist data\n        final String SQL_CREATE_BUSTLIST_TABLE = \"CREATE TABLE \" + BusContract.BusEntry.TABLE_NAME + \" (\" +\n                BusContract.BusEntry._ID + \" INTEGER PRIMARY KEY AUTOINCREMENT,\" +\n                BusContract.BusEntry.COLUMN_BUS_STOP_CODE + \" TEXT NOT NULL, \" +\n                BusContract.BusEntry.COLUMN_BUS_STOP_CODE2 + \" TEXT, \" +\n                BusContract.BusEntry.COLUMN_BUS_STOP_CODE3 + \" TEXT, \" +\n                BusContract.BusEntry.COLUMN_BUS_LINE + \" TEXT, \" +\n                BusContract.BusEntry.COLUMN_BUS_NAME + \" TEXT, \" +\n                BusContract.BusEntry.COLUMN_BUS_STOP_GROUP + \" TEXT, \" +\n                BusContract.BusEntry.COLUMN_TIMESTAMP + \" TIMESTAMP DEFAULT CURRENT_TIMESTAMP\" +\n                \"); \";\n\n        final String SQL_CREATE_ALL_BUS_TABLE = \"CREATE TABLE \" + BusContract.BusEntry.TABLE_NAME_ALL_BUS + \" (\" +\n                BusContract.BusEntry._ID + \" INTEGER PRIMARY KEY AUTOINCREMENT,\" +\n                BusContract.BusEntry.COLUMN_BUS_STOP_CODE + \" TEXT NOT NULL, \" +\n                BusContract.BusEntry.COLUMN_BUS_NAME + \" TEXT NOT NULL, \" +\n                BusContract.BusEntry.COLUMN_BUS_STOP_LAT + \" TEXT NOT NULL, \" +\n                BusContract.BusEntry.COLUMN_BUS_STOP_LNG + \" TEXT NOT NULL \" +\n                \"); \";\n\n        sqLiteDatabase.execSQL(SQL_CREATE_BUSTLIST_TABLE);\n        sqLiteDatabase.execSQL(SQL_CREATE_ALL_BUS_TABLE);\n        //insert sample data\n        sqLiteDatabase.execSQL(\"INSERT INTO \"+ BusContract.BusEntry.TABLE_NAME + \" (\" +\n                BusContract.BusEntry.COLUMN_BUS_STOP_CODE + \", \" +\n                BusContract.BusEntry.COLUMN_BUS_STOP_CODE2 + \", \" +\n                BusContract.BusEntry.COLUMN_BUS_STOP_GROUP + \") \" +\n                \"VALUES (\" +\n                \"\\'550552\\', \" +\n                \"\\'551575\\', \" +\n                \"\\'sample\\'); \");\n\n        //get the application's resources\n        String file = \"res/raw/stops_mtabc.txt\";\n        importDataFromTxtFile(file,sqLiteDatabase);\n        file = \"res/raw/stops_queens.txt\";\n        importDataFromTxtFile(file,sqLiteDatabase);\n        file = \"res/raw/stops_manhattan.txt\";\n        importDataFromTxtFile(file,sqLiteDatabase);\n        file = \"res/raw/stops_brooklyn.txt\";\n        importDataFromTxtFile(file,sqLiteDatabase);\n        file = \"res/raw/stops_bronx.txt\";\n        importDataFromTxtFile(file,sqLiteDatabase);\n        file = \"res/raw/stops_staten_island.txt\";\n        importDataFromTxtFile(file,sqLiteDatabase);\n\n    }\n\n     **/\n\n    @Override\n    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {\n        //drop the table and create a new one, if you change the database version\n        //sqLiteDatabase.execSQL(\"DROP TABLE IF EXISTS \" + BusContract.BusEntry.TABLE_NAME);\n        //sqLiteDatabase.execSQL(\"DROP TABLE IF EXISTS \" + BusContract.BusEntry.TABLE_NAME_ALL_BUS);\n        //onCreate(sqLiteDatabase);\n    }\n\n    /**\n     * This function import data from a txt file into database\n     * @param file the txt file including the path\n     * @param sqLiteDatabase\n     */\n    public void importDataFromTxtFile(String file,SQLiteDatabase sqLiteDatabase){\n         try( InputStream in = this.getClass().getClassLoader().getResourceAsStream(file)) {\n            BufferedReader br = new BufferedReader(new InputStreamReader(in ));\n            String myLine = br.readLine();\n\n             while (myLine != null){\n                 String[] array1 = myLine.split(\",\");\n                 for (int i = 0; i < array1.length; i++){\n                     /**\n                     array1[i] = array1[i].replaceAll(\"\\\"\",\"\");\n                     array1[i] = array1[i].replaceAll(\"\\\\s+\",\"\");\n                     array1[i] = array1[i].replaceAll(\"/\",\"\");\n                      **/\n                     array1[i] = array1[i].replaceAll(\"'\",\"\");\n                 }\n                 sqLiteDatabase.execSQL(\"INSERT INTO \" + BusContract.BusEntry.TABLE_NAME_ALL_BUS + \" (\" +\n                         BusContract.BusEntry.COLUMN_BUS_STOP_CODE + \", \" +\n                         BusContract.BusEntry.COLUMN_BUS_NAME + \", \" +\n                         BusContract.BusEntry.COLUMN_BUS_STOP_LAT + \", \" +\n                         BusContract.BusEntry.COLUMN_BUS_STOP_LNG + \") \" +\n                         \"VALUES (\" +\n                         \"\\'\" +array1[0] + \"\\',\" +\n                         \"\\'\" + array1[1] + \"\\',\" +\n                         \"\\'\" + array1[3] + \"\\',\" +\n                         \"\\'\" + array1[4] + \"\\');\");\n                myLine = br.readLine();\n\n             }\n            /**\n            int data = in.read();\n            while(data !=-1){\n                System.out.print((char)data);\n                data = in.read();\n            }\n             **/\n        }catch (IOException e){\n\n        }\n\n    }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/wen/android/mtabuscomparison/utilities/BusDbHelper.java	(revision 54c5879ac9089276e449320b6a0363e89329ed27)
++++ app/src/main/java/com/wen/android/mtabuscomparison/utilities/BusDbHelper.java	(date 1612212381018)
+@@ -1,11 +1,7 @@
+ package com.wen.android.mtabuscomparison.utilities;
+ 
+ import android.content.Context;
+-import android.content.res.Resources;
+ import android.database.sqlite.SQLiteDatabase;
+-import android.database.sqlite.SQLiteOpenHelper;
+-import android.content.res.Resources;
+-import android.util.Log;
+ 
+ import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
+ 
+@@ -13,7 +9,6 @@
+ import java.io.IOException;
+ import java.io.InputStream;
+ import java.io.InputStreamReader;
+-import java.nio.charset.StandardCharsets;
+ 
+ /**
+  * Created by yuan on 4/11/2017.
+@@ -23,7 +18,7 @@
+     //The database name
+     private static final String DATABASE_NAME = "buslist.db";
+     //if you change the database schema, you must increment the database version
+-    private static final int DATABASE_VERSION = 5;
++    private static final int DATABASE_VERSION = 8;
+ 
+     //a handle to the application's resources
+     private String output;

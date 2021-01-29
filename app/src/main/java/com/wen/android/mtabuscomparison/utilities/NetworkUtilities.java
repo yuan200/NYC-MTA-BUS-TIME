@@ -3,9 +3,11 @@ package com.wen.android.mtabuscomparison.utilities;
 import android.net.Uri;
 import android.util.Log;
 
-import com.wen.android.mtabuscomparison.model.BusDirection;
-import com.wen.android.mtabuscomparison.model.StopsForRoute;
-import com.wen.android.mtabuscomparison.model.TimeInfo;
+import com.wen.android.mtabuscomparison.BusApplication;
+import com.wen.android.mtabuscomparison.R;
+import com.wen.android.mtabuscomparison.stop.BusDirection;
+import com.wen.android.mtabuscomparison.stop.StopInfo;
+import com.wen.android.mtabuscomparison.stop.TimeInfo;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,6 +23,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
+import timber.log.Timber;
+
 /**
  * Created by yuan on 4/11/2017.
  */
@@ -31,8 +35,8 @@ public final class NetworkUtilities {
     private static final String SIRI_BUSTIME_URL =
             "http://bustime.mta.info/api/siri/stop-monitoring.json";
     private static final String api_key = "key";
-    static final String API_KEY =
-            "272e0b38-54a4-485f-875a-e9b1460a9509";
+    //todo move api key
+    static final String API_KEY = BusApplication.Companion.getInstance().getString(R.string.mta_bus_api_key);
     static final String MONITORING_REF ="MonitoringRef";
 
     //for MTA one bus away
@@ -95,6 +99,7 @@ public final class NetworkUtilities {
      * @throws java.io.IOException Related to network and stream reading
      */
     public static String getResponseFromHttpUrl(URL url) throws IOException {
+        Timber.i(url.toString());
         HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
         try{
             InputStream in = urlConnection.getInputStream();
@@ -218,8 +223,8 @@ public final class NetworkUtilities {
      */
     public static BusDirection getStopListForRoute(String result){
         BusDirection busDirection = new BusDirection();
-        ArrayList<StopsForRoute> stopsForRouteList0 = new ArrayList<>();
-        ArrayList<StopsForRoute> stopsForRouteList1 = new ArrayList<>();
+        ArrayList<StopInfo> stopInfoList0 = new ArrayList<>();
+        ArrayList<StopInfo> stopInfoList1 = new ArrayList<>();
         try{
             JSONObject rootJsonObject = new JSONObject(result);
             String code = rootJsonObject.getString("code");
@@ -227,12 +232,12 @@ public final class NetworkUtilities {
             *
              **/
             if (!code.equals("200")){
-                StopsForRoute errorStop = new StopsForRoute();
+                StopInfo errorStop = new StopInfo();
                 errorStop.setId("error");
-                stopsForRouteList0.add(errorStop);
-                stopsForRouteList1.add(errorStop);
-                busDirection.setDirection0(stopsForRouteList0);
-                busDirection.setDirection1(stopsForRouteList1);
+                stopInfoList0.add(errorStop);
+                stopInfoList1.add(errorStop);
+                busDirection.setDirection0(stopInfoList0);
+                busDirection.setDirection1(stopInfoList1);
                 Log.i("error checking: " , "handle error success");
                 return busDirection;
             }
@@ -253,12 +258,12 @@ public final class NetworkUtilities {
 
             //stop id
             for (int i = 0; i< stopIdsJsonArray.length(); i++){
-                StopsForRoute stop = new StopsForRoute();
+                StopInfo stop = new StopInfo();
                 String stopIds = stopIdsJsonArray.getString(i);
                 Log.i("json array!!!", "json array: " + stopIds);
                 stop.setId(stopIds);
                 stop.setBusDirection(nameJsonObject.getString("name"));
-                stopsForRouteList0.add(stop);
+                stopInfoList0.add(stop);
             }
 
             // stopGroups sub object 2
@@ -271,38 +276,38 @@ public final class NetworkUtilities {
             JSONArray stopIdsJsonArray2 = stopGroupsSubObject1.getJSONArray("stopIds");
 
             for (int i = 0; i< stopIdsJsonArray2.length(); i++){
-                StopsForRoute stop = new StopsForRoute();
+                StopInfo stop = new StopInfo();
                 String stopIds = stopIdsJsonArray2.getString(i);
                 Log.i("json array!!!", "json array: " + stopIds);
                 stop.setId(stopIds);
                 stop.setBusDirection(nameJsonObject2.getString("name"));
-                stopsForRouteList1.add(stop);
+                stopInfoList1.add(stop);
             }
 
             JSONArray stopsJsonArray = dataJsonObject.getJSONArray("stops");
             for (int i = 0; i < stopsJsonArray.length(); i++){
                 JSONObject stopObject = stopsJsonArray.getJSONObject(i);
                 String stopid = stopObject.getString("id");
-                for (int j = 0; j < stopsForRouteList0.size(); j++){
-                    StopsForRoute stop = stopsForRouteList0.get(j);
+                for (int j = 0; j < stopInfoList0.size(); j++){
+                    StopInfo stop = stopInfoList0.get(j);
                     if (stopid.equals(stop.getId())){
                         stop.setStopCode(stopObject.getString("code"));
                         stop.setIntersections(stopObject.getString("name"));
-                        stopsForRouteList0.set(j, stop);
+                        stopInfoList0.set(j, stop);
                     }
                 }
-                for (int j = 0; j < stopsForRouteList1.size(); j++){
-                    StopsForRoute stop = stopsForRouteList1.get(j);
+                for (int j = 0; j < stopInfoList1.size(); j++){
+                    StopInfo stop = stopInfoList1.get(j);
                     if (stopid.equals(stop.getId())){
                         stop.setStopCode(stopObject.getString("code"));
                         stop.setIntersections(stopObject.getString("name"));
-                        stopsForRouteList1.set(j, stop);
+                        stopInfoList1.set(j, stop);
                     }
                 }
             }
 
-            busDirection.setDirection0(stopsForRouteList0);
-            busDirection.setDirection1(stopsForRouteList1);
+            busDirection.setDirection0(stopInfoList0);
+            busDirection.setDirection1(stopInfoList1);
 
 
         } catch (JSONException e){

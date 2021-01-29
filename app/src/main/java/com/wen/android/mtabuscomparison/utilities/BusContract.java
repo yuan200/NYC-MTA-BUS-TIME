@@ -18,6 +18,7 @@ public class BusContract {
         public static final String COLUMN_BUS_STOP_GROUP = "groupName";
         public static final String COLUMN_BUS_STOP_LAT = "lat";
         public static final String COLUMN_BUS_STOP_LNG = "lng";
+        public static final String COLUMN_BUS_STOP_ROUTES = "routes";
         public static final String  COLUMN_TIMESTAMP = "timestamp";
     }
 }

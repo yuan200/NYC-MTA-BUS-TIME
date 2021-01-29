@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MTA BUS COMPARISON</string>
+    <string name="app_name">MTA BUS TIME</string>
     <string name="title_search">Search</string>
     <string name="title_favorite">Favorite</string>
     <string name="title_nearby">Help</string>

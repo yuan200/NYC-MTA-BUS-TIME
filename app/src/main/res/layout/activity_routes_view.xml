@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.wen.android.mtabuscomparison.RoutesViewActivity">
+    tools:context="com.wen.android.mtabuscomparison.screens.routesview.RoutesViewActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
