@@ -1,11 +1,7 @@
 package com.wen.android.mtabuscomparison.utilities;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.content.res.Resources;
-import android.util.Log;
 
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
@@ -13,7 +9,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Created by yuan on 4/11/2017.
@@ -23,7 +18,7 @@ public class BusDbHelper extends SQLiteAssetHelper {
     //The database name
     private static final String DATABASE_NAME = "buslist.db";
     //if you change the database schema, you must increment the database version
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 8;
 
     //a handle to the application's resources
     private String output;
