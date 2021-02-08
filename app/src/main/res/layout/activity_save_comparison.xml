@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.wen.android.mtabuscomparison.SaveComparison">
+    tools:context="com.wen.android.mtabuscomparison.screens.favorite.SaveFavorite">
 
     <EditText
         android:id="@+id/save_group_name"
