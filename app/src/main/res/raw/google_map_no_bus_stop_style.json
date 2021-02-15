@@ -1,5 +1,13 @@
 [
   {
+    "featureType": "poi.business",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
     "featureType": "transit.station.bus",
     "stylers": [
       {

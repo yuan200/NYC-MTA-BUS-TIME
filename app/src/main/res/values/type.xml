@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TextAppearance.Subtitle0" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="fontFamily">@font/rubik_medium</item>
+        <item name="lineHeight">22sp</item>
+    </style>
+    <style name="TextAppearance.Bus.HeadlineBold5" parent="TextAppearance.MaterialComponents.Headline5">
+        <item name="fontFamily">@font/work_sans_bold</item>
+        <item name="android:textColor">@color/color_on_surface_emphasis_high</item>
+    </style>
+    <style name="TextAppearance.Bus.HeadlineMedium5" parent="TextAppearance.MaterialComponents.Headline5">
+        <item name="fontFamily">@font/work_sans_bold</item>
+        <item name="android:textColor">@color/color_on_surface_emphasis_medium</item>
+    </style>
+</resources>

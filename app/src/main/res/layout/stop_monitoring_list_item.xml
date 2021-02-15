@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?colorOnPrimary"
+    android:layout_marginHorizontal="@dimen/grid_1_5"
+    android:layout_marginBottom="4dp"
+    android:elevation="4dp"
+    android:theme="@style/StopMonitoringCardTheme">
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/published_line"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/published_line" />
+
+    <TextView
+        android:id="@+id/published_line"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="TextView"
+        android:textColor="@color/primaryTextColor"
+        android:textAppearance="?textAppearanceHeadline4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="M34" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/imageView"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:rotation="90"
+        app:layout_constraintEnd_toStartOf="@+id/destination_name"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/published_line"
+        app:srcCompat="@drawable/ic_arrow_circle_up_black_24dp" />
+
+    <TextView
+        android:id="@+id/destination_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:maxLines="2"
+        android:textAppearance="?textAppearanceBody1"
+        android:textColor="@color/material_on_background_emphasis_medium"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@+id/expected_arrive_time"
+        app:layout_constraintStart_toEndOf="@+id/imageView"
+        app:layout_constraintTop_toBottomOf="@+id/published_line"
+        tools:text="@string/lorem_m" />
+
+    <TextView
+        android:id="@+id/expected_arrive_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?textAppearanceBody1"
+        android:textColor="@color/material_on_background_emphasis_medium"
+        android:layout_marginEnd="16dp"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/published_line"
+        tools:text="0 min, arrival time: 10:10" />
+
+    <TextView
+        android:id="@+id/presentable_distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="@dimen/grid_0_5"
+        android:textAppearance="?textAppearanceBody1"
+        android:textColor="@color/material_on_background_emphasis_medium"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/barrier"
+        tools:text=" 1 stop away" />
+
+    <TextView
+        android:id="@+id/arrival_proximity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="@dimen/grid_0_5"
+        android:textAppearance="?textAppearanceBody1"
+        android:textColor="@color/material_on_background_emphasis_medium"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/presentable_distance"
+        tools:text="arrival proximity ?" />
+
+    <TextView
+        android:id="@+id/next_bus_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="@dimen/grid_0_5"
+        android:textAppearance="?textAppearanceBody1"
+        android:textColor="@color/material_on_background_emphasis_medium"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/arrival_proximity"
+        tools:text="Next at 10: 20 11:23" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="imageView,destination_name,expected_arrive_time" />
+
+    <TextView
+        android:id="@+id/live_minute"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="36dp"
+        android:textColor="@color/primaryTextColor"
+        android:textSize="30sp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/published_line"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="3" />
+
+    <com.wen.android.mtabuscomparison.ui.stopmonitoring.MySignalIcon
+        android:id="@+id/stop_monitoring_signal"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        app:layout_constraintCircle="@id/live_minute"
+        app:layout_constraintCircleAngle="60"
+        app:layout_constraintCircleRadius="18dp"
+        tools:layout_editor_absoluteX="375dp"
+        tools:layout_editor_absoluteY="24dp" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="min"
+        android:textColor="@color/primaryTextColor"
+        app:layout_constraintBaseline_toBaselineOf="@+id/live_minute"
+        app:layout_constraintStart_toEndOf="@+id/live_minute" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

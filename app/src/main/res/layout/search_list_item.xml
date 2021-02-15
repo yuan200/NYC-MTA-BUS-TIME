@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="itemType"
+            type="com.wen.android.mtabuscomparison.feature.search.SearchItemType" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingLeft="@dimen/grid_2"
+            android:src="@{itemType == com.wen.android.mtabuscomparison.feature.search.SearchItemType.MAP ? @drawable/ic_baseline_map_24 : @drawable/ic_bus_blue_24dp}" />
+
+        <TextView
+            android:id="@+id/search_result_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:paddingHorizontal="@dimen/grid_2"
+            android:paddingVertical="@dimen/grid_1"
+            android:textAppearance="?attr/textAppearanceHeadline5"
+            android:textColor="?attr/colorOnPrimarySurface"
+            tools:text="@string/lorem_s">
+
+        </TextView>
+    </LinearLayout>
+</layout>

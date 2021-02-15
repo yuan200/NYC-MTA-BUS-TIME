@@ -3,7 +3,7 @@ package com.wen.android.mtabuscomparison.persistence.migrations
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import com.wen.android.mtabuscomparison.utilities.BusContract
+import com.wen.android.mtabuscomparison.util.BusContract
 
 class SqliteTestOpenHelper @JvmOverloads constructor(
         val context: Context,

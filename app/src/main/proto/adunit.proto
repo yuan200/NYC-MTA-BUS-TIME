@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package adunit;
+
+option java_package = "com.wen.android.mtabuscomparison.data.remote.ad";
+option java_outer_classname = "AdUnitProtos";
+
+message AdUnit {
+    string adUnitId = 1;
+    bool enabled = 2;
+    string location = 3;
+}
+
+message AdUnits {
+    repeated AdUnit adUnits = 1;
+    int64 expired = 2;
+}

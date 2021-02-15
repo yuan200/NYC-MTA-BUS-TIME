@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/stopMapFragment">
+
+    <fragment
+        android:id="@+id/stopMapFragment"
+        android:name="com.wen.android.mtabuscomparison.ui.stopmap.StopMapFragment"
+        android:label="StopMapFragment" >
+    </fragment>
+    <fragment
+        android:id="@+id/favoriteFragment"
+        android:name="com.wen.android.mtabuscomparison.ui.favorite.FavoriteFragment"
+        android:label="FavoriteFragment" />
+</navigation>

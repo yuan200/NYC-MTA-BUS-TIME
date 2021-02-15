@@ -1,28 +1,155 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/bus_recycler_view"
+    <data>
+
+        <import type="android.view.View" />
+
+        <import type="com.wen.android.mtabuscomparison.ui.favorite.FavoriteViewModel" />
+
+        <variable
+            name="viewModel"
+            type="FavoriteViewModel" />
+
+    </data>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/dodge_favorite_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-    </androidx.recyclerview.widget.RecyclerView>
+            android:layout_height="match_parent"
+            android:background="?attr/colorPrimary"
+            android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity=""
-        android:text="swipe left to delete"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        app:srcCompat="@android:drawable/ic_input_add"/>
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/grid_2"
+                    android:layout_marginTop="@dimen/grid_0_5"
+                    android:layout_weight="1"
+                    android:text="@string/My_Stations"
+                    android:textAppearance="?attr/textAppearanceHeadline5" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+                <ImageView
+                    android:id="@+id/favorite_close_backdrop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_marginEnd="@dimen/grid_2"
+                    android:paddingTop="@dimen/grid_1"
+                    android:src="@drawable/ic_baseline_cancel_24" />
+            </LinearLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/save_favorite_stop_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/grid_2"
+                android:layout_marginVertical="@dimen/grid_1_5"
+                android:hint="@string/enter_stop_id"
+                android:visibility="@{viewModel.backdropOpened  ? View.VISIBLE : View.INVISIBLE}"
+                app:startIconDrawable="@drawable/ic_favorite_pink_24dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/save_favorite_stop_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/grid_2"
+                android:hint="@string/stop_description"
+                android:visibility="@{viewModel.backdropOpened ? View.VISIBLE : View.INVISIBLE}"
+                app:startIconDrawable="@drawable/ic_favorite_pink_24dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/save_favorite_save"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/grid_2"
+                android:layout_marginTop="@dimen/grid_2"
+                android:paddingHorizontal="@dimen/grid_0_5"
+                android:text="@string/save"
+                android:textAppearance="?attr/textAppearanceHeadline6"
+                app:backgroundTint="?attr/colorPrimaryDark"
+                app:elevation="4dp" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/favorite_bottomsheet"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/corner"
+            app:behavior_expandedOffset='40dp'
+            app:behavior_fitToContents="false"
+            app:behavior_peekHeight="@dimen/bottom_sheet_peek_height"
+            app:behavior_skipCollapsed="true"
+            app:layout_behavior="com.wen.android.mtabuscomparison.ui.commom.bottomsheet.GestureLockedBottomSheetBehavior">
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/bus_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="20dp" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="@{viewModel.showEmptyFavorite ? View.VISIBLE : View.GONE}">
+
+                <ImageView
+                    android:id="@+id/favorite_empty_image"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/twotone_no_transfer_24"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/empty_favorite_text"
+                    android:textAppearance="?attr/textAppearanceHeadline6"
+                    app:layout_constraintTop_toBottomOf="@+id/favorite_empty_image"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="56dp"
+                app:srcCompat="@android:drawable/ic_input_add" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:layout_gravity="bottom"
+                android:background="@android:color/black" />
+        </FrameLayout>
+
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>

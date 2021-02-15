@@ -1,24 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical"
-              android:padding="0dp">
-    <fragment
-        android:id="@+id/mapView"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fragment_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/stop_map_coordinatorLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"/>
+        android:padding="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <fragment
+                android:id="@+id/mapView"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/nearbyRecycleView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_insetEdge= "bottom"
+                android:layout_weight="1"></androidx.recyclerview.widget.RecyclerView>
+
+        </LinearLayout>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/search_view"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:translationY="-20dp"
+            android:layout_gravity="center_vertical" >
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"  >
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/search_icon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    app:srcCompat="@drawable/places_ic_search"/>
+
+                <EditText
+                    android:id="@+id/search_et"
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:layout_toStartOf="@+id/search_hide_btn"
+                    android:layout_toEndOf="@+id/search_icon"
+                    android:hint="Enter route number or stop number"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text" />
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/search_hide_btn"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentRight="true"
+                    android:clickable="true"
+                    app:srcCompat="@drawable/ic_arrow_right_alt_black_18dp"/>
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
 
 
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/nearbyRecycleView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"></androidx.recyclerview.widget.RecyclerView>
-
-
-
-</LinearLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</FrameLayout>

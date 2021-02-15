@@ -1,12 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primaryColor">#FF9800</color>
-    <color name="primaryLightColor">#FFc947</color>
-    <color name="primaryDarkColor">#C66900</color>
+    <!--    Brand Colors-->
+    <color name="primaryColor">#26a69a</color>
+    <color name="secondaryColor">#42a5f5</color>
+    <color name="primaryLightColor">#64d8cb</color>
+    <color name="primaryDarkColor">#00766c</color>
+    <color name="secondaryLightColor">#80d6ff</color>
+    <color name="secondaryDarkColor">#0077c2</color>
+
+    <!--    Text-->
     <color name="primaryTextColor">#000000</color>
-    <color name="colorPrimary">#4fb3bf</color>
-    <color name="colorPrimaryDark">#005662</color>
-    <color name="colorAccent">#FF4081</color>
-    <color name="colorWindowBackground">#F7F8FA</color>
+    <color name="primaryTextColorInverted">#FFFFFF</color>
+
+    <color name="colorAccent">#FFFFFF</color>
+    <color name="colorWhite">#ffffff</color>
+
+<!--    Backgrounds-->
+    <color name="whiteBackground">#eef0f2</color>
     <color name="colorTransparent">#FFFFFF</color>
+
+    <color name="stop_monitoring_vew_text_red">#ffa08f</color>
+    <color name="yellowLightColor">#ffe54c</color>
 </resources>

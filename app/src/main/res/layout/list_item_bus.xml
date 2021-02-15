@@ -1,73 +1,69 @@
-    <androidx.cardview.widget.CardView
-        xmlns:card_view="http://schemas.android.com/apk/res-auto"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/item_card_view"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/grid_0_5"
+    android:layout_marginVertical="@dimen/grid_0_25">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/list_item_cardview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:layout_margin="1dp"
-        card_view:cardBackgroundColor="@color/colorTransparent" >
+        android:layout_height="match_parent"
+        android:clickable="true"
+        app:cardCornerRadius="0dp">
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:padding="10dp">
-
-            <ImageView
-                android:id="@+id/item_bus_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingRight="16dp"
-
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:src="@drawable/ic_directions_bus_black_48dp"/>
+            android:paddingVertical="@dimen/grid_2">
 
             <TextView
-                android:id="@+id/item_read_group"
+                android:id="@+id/item_stop_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:textSize="22dp"
-                android:visibility="visible"
-                android:layout_toRightOf="@+id/item_bus_image"
                 android:layout_alignParentTop="true"
-                android:text="good night"/>
+                android:layout_marginHorizontal="@dimen/grid_2"
+                android:textAppearance="?attr/textAppearanceHeadline5"
+                android:visibility="visible"
+                tools:text="@string/test_stop_name"/>
 
             <TextView
                 android:id="@+id/item_routes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/item_read_group"
-                android:layout_alignLeft="@+id/item_read_group"/>
+                android:layout_below="@+id/item_stop_name"
+                android:layout_alignLeft="@+id/item_stop_name"
+                android:layout_marginRight="@dimen/grid_2"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
+                tools:text="@string/test_route_number"/>
+
             <TextView
                 android:id="@+id/item_read_stop_code_1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/item_bus_image"
 
-                android:visibility="invisible"/>
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/item_read_stop_code_2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="invisible"
-                android:layout_toRightOf="@+id/item_bus_image"/>
-             <TextView
+                android:visibility="gone" />
+
+            <TextView
                 android:id="@+id/item_read_stop_code_3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="invisible"
-                android:layout_toRightOf="@+id/item_bus_image"/>
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/item_row_id"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="invisible"
-                android:layout_toRightOf="@+id/item_bus_image"/>
+                android:visibility="gone" />
         </RelativeLayout>
-
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
+</FrameLayout>
 

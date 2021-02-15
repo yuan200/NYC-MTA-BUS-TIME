@@ -1,6 +1,6 @@
 package com.wen.android.mtabuscomparison.persistence.migrations
 
-import com.wen.android.mtabuscomparison.utilities.BusContract
+import com.wen.android.mtabuscomparison.util.BusContract
 
 class SqliteTestHelper {
     companion object {

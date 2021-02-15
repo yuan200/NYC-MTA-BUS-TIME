@@ -1,14 +1,43 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorPrimaryDark">@color/primaryDarkColor</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:windowBackground">@color/colorWindowBackground</item>
+        <item name="colorSecondary">@color/secondaryColor</item>
+        <item name="android:colorBackground">@color/whiteBackground</item>
+        <item name="colorSurface">@color/colorWhite</item>
+        <item name="colorSecondaryVariant">@color/secondaryDarkColor</item>
         <item name="android:textViewStyle">@style/RobotoTextViewStyle</item>
         <item name="android:buttonStyle">@style/RobotoButtonStyle</item>
+        <item name="android:windowBackground">?android:colorBackground</item>
+
+        <item name="textAppearanceSubtitle0">@style/TextAppearance.Subtitle0</item>
+        <item name="textAppearanceHeadlineBold5">@style/TextAppearance.Bus.HeadlineBold5</item>
+        <item name="textAppearanceHeadlineMedium5">@style/TextAppearance.Bus.HeadlineMedium5</item>
+
+        <item name="emphasisHighAlpha">0.87</item>
+        <item name="emphasisMediumAlpha">0.60</item>
+    </style>
+
+    <!--    Launcher theme with background-->
+    <style name="AppTheme.Launcher" parent="AppTheme">
+        <item name="android:windowBackground">@drawable/splash_screen</item>
+    </style>
+
+    <style name="MainActivityTheme" parent="AppTheme">
+        <item name="android:windowActivityTransitions">true</item>
+        <item name="android:windowExitTransition">@android:transition/explode</item>
+    </style>
+
+    <style name="StopMonitoringCardTheme" parent="AppTheme">
+        <item name="textAppearanceBody1">@style/TextAppearance.stopMonitoringCard.body1</item>
+    </style>
+
+    <style name="TextAppearance.stopMonitoringCard.body1" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:textSize">18sp</item>
     </style>
 
     <style name="RobotoTextViewStyle" parent="android:Widget.TextView">
@@ -18,5 +47,4 @@
     <style name="RobotoButtonStyle" parent="android:Widget.Holo.Button">
         <item name="android:fontFamily">sans-serif</item>
     </style>
-
 </resources>

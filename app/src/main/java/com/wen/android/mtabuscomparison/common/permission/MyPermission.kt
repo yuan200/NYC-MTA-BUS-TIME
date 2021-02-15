@@ -4,7 +4,8 @@ import android.Manifest
 
 enum class MyPermission(val androidPermission: String) {
     // declare runtime permissions specific to your app here (don't keep unused ones)
-    FINE_LOCATION(Manifest.permission.ACCESS_FINE_LOCATION);
+    FINE_LOCATION(Manifest.permission.ACCESS_FINE_LOCATION),
+    COARSE_LOCATION(Manifest.permission.ACCESS_COARSE_LOCATION);
 
     companion object {
         fun fromAndroidPermission(androidPermission: String): MyPermission {
