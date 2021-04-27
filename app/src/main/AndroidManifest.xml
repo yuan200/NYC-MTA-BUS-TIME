@@ -51,7 +51,7 @@
             android:resource="@array/preloaded_fonts" />
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-7064691312140805~9218451648" />
+            android:value="@string/google_admod_publish_id" />
     </application>
 
 </manifest>

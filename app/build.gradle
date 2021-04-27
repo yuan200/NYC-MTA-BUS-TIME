@@ -73,6 +73,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             resValue 'string', "google_map_api_key", NycMtaBusTime_googleApiKey
             resValue 'string', "mta_bus_api_key", MtaBusApiKey
+            resValue 'string', "google_admod_publish_id", GoogleAdPublichId
             resValue 'string', "app_unit_id_stop_monitoring", "ca-app-pub-3940256099942544/6300978111"
             resValue 'string', "app_unit_id_stop_map_top", "ca-app-pub-3940256099942544/6300978111"
         }
@@ -81,8 +82,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             resValue 'string', "google_map_api_key", NycMtaBusTime_googleApiKey
             resValue 'string', "mta_bus_api_key", MtaBusApiKey
-            resValue 'string', "app_unit_id_stop_monitoring", "ca-app-pub-7064691312140805/3458992922"
-            resValue 'string', "app_unit_id_stop_map_top", "ca-app-pub-7064691312140805/4233703339"
+            resValue 'string', "google_admod_publish_id", GoogleAdPublichId
+            resValue 'string', "app_unit_id_stop_monitoring", StopMonitoringAdUniId
+            resValue 'string', "app_unit_id_stop_map_top", StopMapAdUnitid
         }
     }
     // used by Room, to test migrations

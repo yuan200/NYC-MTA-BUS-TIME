@@ -16,7 +16,7 @@
         <entry key="app/src/main/res/drawable/splash_screen.xml" value="0.26875" />
         <entry key="app/src/main/res/drawable/twotone_directions_bus_filled_24.xml" value="0.3828125" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.16666666666666666" />
-        <entry key="app/src/main/res/layout/activity_stop_monitoring.xml" value="0.17831813576494426" />
+        <entry key="app/src/main/res/layout/activity_stop_monitoring.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_favorite.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_stop_map.xml" value="0.17831813576494426" />
         <entry key="app/src/main/res/layout/list_item_bus.xml" value="0.1287037037037037" />
