@@ -9,7 +9,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.wen.android.mtabuscomparison.R;
-import com.wen.android.mtabuscomparison.feature.stop.BusDatabase;
+import com.wen.android.mtabuscomparison.feature.stopmonitoring.BusDatabase;
 import com.wen.android.mtabuscomparison.feature.favorite.FavoriteStop;
 
 import java.util.Date;

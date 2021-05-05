@@ -1,4 +1,6 @@
-package com.wen.android.mtabuscomparison.feature.stop;
+package com.wen.android.mtabuscomparison.feature.stopmonitoring;
+
+import com.wen.android.mtabuscomparison.data.remote.bustime.VehicleLocation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +24,7 @@ public class StopMonitoringListItem {
     private String mErrorMessage;
     private List<String> mNextBusTime = new ArrayList<>();
     private List<String> situationSummary = new ArrayList<>();
+    private VehicleLocation mVehicleLocation;
 
     public StopMonitoringListItem(){
         mIsSuccess = true;
@@ -130,5 +133,13 @@ public class StopMonitoringListItem {
 
     public void setSituationSummary(List<String> situationSummary) {
         this.situationSummary = situationSummary;
+    }
+
+    public VehicleLocation getVehicleLocation() {
+        return mVehicleLocation;
+    }
+
+    public void setVehicleLocation(VehicleLocation mVehicleLocation) {
+        this.mVehicleLocation = mVehicleLocation;
     }
 }

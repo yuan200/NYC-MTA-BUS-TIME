@@ -1,19 +1,19 @@
 package com.wen.android.mtabuscomparison.ui.stopmonitoring
 
-import com.wen.android.mtabuscomparison.feature.stop.MonitoringData
-import com.wen.android.mtabuscomparison.feature.stop.StopMonitoringListItem
+import com.wen.android.mtabuscomparison.feature.stopmonitoring.MonitoringData
+import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopMonitoringListItem
 import com.wen.android.mtabuscomparison.ui.commom.ObservableViewMvc
 
 interface StopMonitoringViewMvc: ObservableViewMvc<StopMonitoringViewMvc.Listener> {
-    fun refreshMonitoringView(monitoringData: MonitoringData)
     fun setRefreshing(refreshing: Boolean)
     fun getFavorite(): Boolean
     fun setFavorite(isFavorite: Boolean)
-    fun onResume()
-    fun onPause()
-    fun onDestroy()
+    fun onMvcViewResume()
+    fun onMvcViewPause()
+    fun onMvcViewDestroy()
     fun setAdapterData(busMonitoring: List<StopMonitoringListItem>)
     fun checkError(monitoringData: MonitoringData)
+    fun setTitle(stopName: String)
 
     interface Listener {
         fun onSwipeRefresh()

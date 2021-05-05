@@ -1,6 +1,5 @@
 package com.wen.android.mtabuscomparison.ui.favorite;
 
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +11,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.wen.android.mtabuscomparison.BusApplication;
 import com.wen.android.mtabuscomparison.R;
 import com.wen.android.mtabuscomparison.feature.favorite.Favorite;
-import com.wen.android.mtabuscomparison.feature.stop.BusDatabase;
+import com.wen.android.mtabuscomparison.feature.stopmonitoring.BusDatabase;
 
 import java.util.List;
 
@@ -21,12 +20,10 @@ import timber.log.Timber;
 public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.BusHolder> {
     private List<Favorite> mFavorites;
     private FirebaseAnalytics mFirebaseAnalytics;
-    private final static String FAVORITE_CHECKED = "favorite_checked";
-    private final static String DATABASE_ROW_ID = "row_id";
     private OnFavoriteClickedListener mListener;
 
     interface OnFavoriteClickedListener {
-        void oncFavoriteClicked(String[] stopCodeArray, String check, String rowId);
+        void oncFavoriteClicked(String stopId, String check, String rowId);
     }
 
     public FavoriteAdapter(List<Favorite> favorites, OnFavoriteClickedListener listener) {
@@ -98,23 +95,8 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.BusHol
 
         @Override
         public void onClick(View v) {
-            String[] stopcodeArray = new String[3];
-            //get the bus code from the user input
-            stopcodeArray[0] = mStopCodeView1.getText().toString();
-            stopcodeArray[1] = mStopCodeView2.getText().toString();
-            stopcodeArray[2] = mStopCodeView3.getText().toString();
-
-            Bundle bundle = new Bundle();
-            bundle.putString(FirebaseAnalytics.Param.CONTENT, "Favorite");
-            String contentType = "0";
-            if (!stopcodeArray[2].isEmpty()) contentType = "3 favorites";
-            else if (!stopcodeArray[1].isEmpty()) contentType = "2 favorites";
-            else if (!stopcodeArray[0].isEmpty()) {
-                contentType = "1 favorite";
-            }
-            bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, contentType);
-            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
-            mListener.oncFavoriteClicked(stopcodeArray, "favorite_check", mRowId.getText().toString());
+            String stopId = mStopCodeView1.getText().toString();
+            mListener.oncFavoriteClicked(stopId, "favorite_check", mRowId.getText().toString());
         }
     }
 }

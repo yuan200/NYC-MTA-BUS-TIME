@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.wen.android.mtabuscomparison.R
 import com.wen.android.mtabuscomparison.databinding.ListItemBusBinding
-import com.wen.android.mtabuscomparison.feature.stop.StopInfo
+import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopInfo
 import com.wen.android.mtabuscomparison.ui.commom.BaseObservableViewMvc
 import com.wen.android.mtabuscomparison.util.getColorFromAttr
 

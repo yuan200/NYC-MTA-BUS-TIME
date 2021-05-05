@@ -4,7 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.wen.android.mtabuscomparison.R
 import com.wen.android.mtabuscomparison.databinding.StopMonitoringListItemBinding
-import com.wen.android.mtabuscomparison.feature.stop.StopMonitoringListItem
+import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopMonitoringListItem
 import com.wen.android.mtabuscomparison.util.getMinutesFromNow
 import com.wen.android.mtabuscomparison.util.getTime
 import com.wen.android.mtabuscomparison.util.lists.BaseAdapter
@@ -36,7 +36,11 @@ class StopMonitoringViewHolder(
         }
 
         destinationName.apply {
+            text = item.destinationName
+        }
+        expectedArriveTime.apply {
             text = "arrival time: ${item.expectedArrivalTime.getTime()}"
+            visibility = if (item.expectedArrivalTime.isNullOrEmpty()) View.GONE else View.VISIBLE
         }
 
         presentableDistance.apply {

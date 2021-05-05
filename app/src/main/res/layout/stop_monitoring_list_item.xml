@@ -54,7 +54,6 @@
         android:textAppearance="?textAppearanceBody1"
         android:textColor="@color/material_on_background_emphasis_medium"
         app:layout_constrainedWidth="true"
-        app:layout_constraintEnd_toStartOf="@+id/expected_arrive_time"
         app:layout_constraintStart_toEndOf="@+id/imageView"
         app:layout_constraintTop_toBottomOf="@+id/published_line"
         tools:text="@string/lorem_m" />
@@ -65,10 +64,10 @@
         android:layout_height="wrap_content"
         android:textAppearance="?textAppearanceBody1"
         android:textColor="@color/material_on_background_emphasis_medium"
-        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
         app:layout_constrainedWidth="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/published_line"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/destination_name"
         tools:text="0 min, arrival time: 10:10" />
 
     <TextView

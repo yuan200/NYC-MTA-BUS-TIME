@@ -3,7 +3,7 @@ package com.wen.android.mtabuscomparison.ui.stopmap
 import android.location.Location
 import android.widget.EditText
 import com.google.android.gms.maps.model.LatLng
-import com.wen.android.mtabuscomparison.feature.stop.StopInfo
+import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopInfo
 import com.wen.android.mtabuscomparison.ui.commom.ObservableViewMvc
 
 interface StopMapViewMvc: ObservableViewMvc<StopMapViewMvc.Listener> {
@@ -46,9 +46,5 @@ interface StopMapViewMvc: ObservableViewMvc<StopMapViewMvc.Listener> {
 
     fun moveCameraTo(latLng: LatLng)
 
-    fun onResume()
-
-    fun onPause()
-
-    fun onDestroy()
+    fun onDestroyView()
 }

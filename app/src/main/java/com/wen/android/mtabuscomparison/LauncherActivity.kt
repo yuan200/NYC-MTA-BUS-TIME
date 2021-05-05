@@ -2,6 +2,7 @@ package com.wen.android.mtabuscomparison
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.wen.android.mtabuscomparison.ui.main.MainActivity
 
 class LauncherActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

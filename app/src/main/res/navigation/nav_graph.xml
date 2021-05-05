@@ -1,16 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/stopMapFragment">
 
     <fragment
         android:id="@+id/stopMapFragment"
         android:name="com.wen.android.mtabuscomparison.ui.stopmap.StopMapFragment"
-        android:label="StopMapFragment" >
+        android:label="StopMapFragment"
+        tools:layout="@layout/fragment_stop_map">
+
+        <action
+            android:id="@+id/action_stopMapFragment_to_stopMonitoringFragment"
+            app:destination="@+id/stopMonitoringFragment" />
     </fragment>
     <fragment
         android:id="@+id/favoriteFragment"
         android:name="com.wen.android.mtabuscomparison.ui.favorite.FavoriteFragment"
-        android:label="FavoriteFragment" />
+        android:label="FavoriteFragment">
+
+        <action
+            android:id="@+id/action_favoriteFragment_to_stopMonitoringFragment"
+            app:destination="@id/stopMonitoringFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/stopMonitoringFragment"
+        android:name="com.wen.android.mtabuscomparison.ui.stopmonitoring.StopMonitoringFragment"
+        android:label="StopMonitoringFragment" >
+        <argument
+            android:name="stopId"
+            app:argType="string" />
+        <argument
+            android:name="isFavorite"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <argument
+            android:name="dbRowId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+    </fragment>
 </navigation>

@@ -5,9 +5,9 @@ import android.util.Log;
 
 import com.wen.android.mtabuscomparison.BusApplication;
 import com.wen.android.mtabuscomparison.R;
-import com.wen.android.mtabuscomparison.feature.stop.BusDirection;
-import com.wen.android.mtabuscomparison.feature.stop.StopInfo;
-import com.wen.android.mtabuscomparison.feature.stop.StopMonitoringListItem;
+import com.wen.android.mtabuscomparison.feature.stopmonitoring.BusDirection;
+import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopInfo;
+import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopMonitoringListItem;
 
 import org.json.JSONArray;
 import org.json.JSONException;

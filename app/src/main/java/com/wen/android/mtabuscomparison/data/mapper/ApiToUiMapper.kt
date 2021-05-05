@@ -1,11 +1,11 @@
 package com.wen.android.mtabuscomparison.data.mapper
 
 import com.wen.android.mtabuscomparison.data.remote.bustime.StopMonitoringResponse
-import com.wen.android.mtabuscomparison.feature.stop.MonitoringData
-import com.wen.android.mtabuscomparison.feature.stop.StopMonitoringListItem
+import com.wen.android.mtabuscomparison.feature.stopmonitoring.MonitoringData
+import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopMonitoringListItem
 
 class ApiToUiMapper {
-    fun mapToStopForId(response: StopMonitoringResponse, stopId: String): MonitoringData {
+    fun mapToStopMonitoring(response: StopMonitoringResponse, stopId: String): MonitoringData {
         //MonitoredStopVisit could be null if query a wrong stop number, ex: 141266
         val monitoringDelivery = response.Siri.ServiceDelivery.StopMonitoringDelivery[0]
         val monitoredVehicleList = monitoringDelivery.MonitoredStopVisit ?: emptyList()
@@ -20,6 +20,7 @@ class ApiToUiMapper {
                 timeInfo.publishedLineName = vehicle.MonitoredVehicleJourney.PublishedLineName
                 timeInfo.destinationName =
                     toCamelCase(vehicle.MonitoredVehicleJourney.DestinationName)
+                timeInfo.vehicleLocation = vehicle.MonitoredVehicleJourney.VehicleLocation
                 if (vehicle.MonitoredVehicleJourney.MonitoredCall != null) {
                     timeInfo.expectedArrivalTime =
                         vehicle.MonitoredVehicleJourney.MonitoredCall.ExpectedArrivalTime

@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.wen.android.mtabuscomparison.R
 import com.wen.android.mtabuscomparison.feature.search.SearchItemType
 import com.wen.android.mtabuscomparison.feature.search.SearchResultItem
-import com.wen.android.mtabuscomparison.feature.stop.BusDatabase
+import com.wen.android.mtabuscomparison.feature.stopmonitoring.BusDatabase
 import com.wen.android.mtabuscomparison.ui.commom.BaseObservableViewMvc
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -71,7 +71,7 @@ class SearchViewMvcImpl(inflater: LayoutInflater, parent: ViewGroup?) :
                             } catch (e: Exception) {
                                 Timber.e(e.message)
                             }
-                            val stops = BusDatabase.getInstance(context).allBusDao()
+                            val stops = BusDatabase.getInstance(context).busStopDao()
                                 .searchByStopNameOrId(s.toString())
                             val results =
                                 stops.map { SearchResultItem(it.stopName ?: "", it.stopId) }

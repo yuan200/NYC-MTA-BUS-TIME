@@ -1,11 +1,12 @@
-package com.wen.android.mtabuscomparison.feature.stop
+package com.wen.android.mtabuscomparison.feature.stopmonitoring
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface StopDao {
+interface BusStopDao {
 
     @Insert
     fun insert(vararg stop: Stop)
@@ -21,4 +22,7 @@ interface StopDao {
 
     @Query("SELECT * FROM stops WHERE stop_name LIKE '%' || :query || '%' OR stop_id = :query")
     suspend fun searchByStopNameOrId(query: String): List<Stop>
+
+    @Query("SELECT * FROM stops WHERE stop_id = :stopId LIMIT 1")
+    fun getStop(stopId: String): Flow<Stop>
 }

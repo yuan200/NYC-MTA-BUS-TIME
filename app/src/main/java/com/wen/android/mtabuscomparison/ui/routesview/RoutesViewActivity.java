@@ -16,8 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.aakira.expandablelayout.ExpandableLinearLayout;
 import com.wen.android.mtabuscomparison.R;
-import com.wen.android.mtabuscomparison.feature.stop.BusDirection;
-import com.wen.android.mtabuscomparison.feature.stop.StopInfo;
+import com.wen.android.mtabuscomparison.feature.stopmonitoring.BusDirection;
+import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopInfo;
 import com.wen.android.mtabuscomparison.ui.stopmonitoring.StopMonitoringActivity;
 import com.wen.android.mtabuscomparison.util.NetworkUtilities;
 
@@ -150,7 +150,7 @@ public class RoutesViewActivity extends AppCompatActivity {
             stopcodeArray[0] = mStopCode.getText().toString();
 
             Intent intent = new Intent(itemView.getContext(), StopMonitoringActivity.class);
-            intent.putExtra(Intent.EXTRA_TEXT,stopcodeArray);
+            intent.putExtra(Intent.EXTRA_TEXT,stopcodeArray[0]);
             itemView.getContext().startActivity(intent);
         }
     }

@@ -9,20 +9,28 @@
         <entry key="app/src/main/res/drawable/corner.xml" value="0.3828125" />
         <entry key="app/src/main/res/drawable/ic_baseline_cancel_24.xml" value="0.3769230769230769" />
         <entry key="app/src/main/res/drawable/ic_bus_24.xml" value="0.22604166666666667" />
+        <entry key="app/src/main/res/drawable/ic_bus_blue_20dp.xml" value="0.29375" />
         <entry key="app/src/main/res/drawable/ic_bus_blue_24dp.xml" value="0.20052083333333334" />
+        <entry key="app/src/main/res/drawable/ic_bus_splash_icon.xml" value="0.29375" />
         <entry key="app/src/main/res/drawable/ic_custom_favorite_btn.xml" value="0.26875" />
+        <entry key="app/src/main/res/drawable/ic_directions_bus_filled_black_36dp.xml" value="0.20208333333333334" />
         <entry key="app/src/main/res/drawable/ic_favorite_border_pink_24dp.xml" value="0.26875" />
         <entry key="app/src/main/res/drawable/ic_notifications_black_24dp.xml" value="0.22604166666666667" />
+        <entry key="app/src/main/res/drawable/ic_round_directions_bus_24.xml" value="0.375" />
+        <entry key="app/src/main/res/drawable/ic_warning_amber_black_24dp.xml" value="0.3828125" />
         <entry key="app/src/main/res/drawable/splash_screen.xml" value="0.26875" />
         <entry key="app/src/main/res/drawable/twotone_directions_bus_filled_24.xml" value="0.3828125" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.16666666666666666" />
         <entry key="app/src/main/res/layout/activity_stop_monitoring.xml" value="0.25" />
-        <entry key="app/src/main/res/layout/fragment_favorite.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_stop_monitoring_2.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_favorite.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_stop_map.xml" value="0.17831813576494426" />
         <entry key="app/src/main/res/layout/list_item_bus.xml" value="0.1287037037037037" />
         <entry key="app/src/main/res/layout/search_list_item.xml" value="0.20989583333333334" />
+        <entry key="app/src/main/res/layout/stop_monitoring_bus_code_item.xml" value="0.36666666666666664" />
         <entry key="app/src/main/res/layout/stop_monitoring_list_item.xml" value="0.1" />
         <entry key="app/src/main/res/layout/view_stop_monitoring_card.xml" value="0.2234375" />
+        <entry key="app/src/main/res/layout/view_stop_monitoring_group.xml" value="0.22735507246376813" />
       </map>
     </option>
   </component>

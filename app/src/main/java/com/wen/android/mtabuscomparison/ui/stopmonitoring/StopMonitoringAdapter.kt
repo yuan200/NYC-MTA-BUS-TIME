@@ -1,7 +1,7 @@
 package com.wen.android.mtabuscomparison.ui.stopmonitoring
 
 import android.view.ViewGroup
-import com.wen.android.mtabuscomparison.feature.stop.StopMonitoringListItem
+import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopMonitoringListItem
 import com.wen.android.mtabuscomparison.util.lists.AbstractAdapter
 
 class StopMonitoringAdapter(var data: List<StopMonitoringListItem>) :

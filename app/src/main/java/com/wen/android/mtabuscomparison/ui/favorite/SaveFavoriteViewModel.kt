@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.wen.android.mtabuscomparison.BusApplication
 import com.wen.android.mtabuscomparison.feature.favorite.FavoriteStop
-import com.wen.android.mtabuscomparison.feature.stop.BusDatabase
+import com.wen.android.mtabuscomparison.feature.stopmonitoring.BusDatabase
 import java.util.*
 
 class SaveFavoriteViewModel: ViewModel() {

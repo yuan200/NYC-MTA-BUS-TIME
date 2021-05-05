@@ -2,7 +2,6 @@ package com.wen.android.mtabuscomparison
 
 import androidx.multidex.MultiDexApplication
 import com.google.android.gms.ads.MobileAds
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 import timber.log.Timber.DebugTree
@@ -17,11 +16,11 @@ class BusApplication: MultiDexApplication() {
     override fun onCreate() {
         super.onCreate()
         instance = this
-        MobileAds.initialize(this) {}
+        MobileAds.initialize(this)
 
         if (BuildConfig.DEBUG) {
             Timber.plant(DebugTree())
-            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(false)
+//            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(false)
         }
     }
 }

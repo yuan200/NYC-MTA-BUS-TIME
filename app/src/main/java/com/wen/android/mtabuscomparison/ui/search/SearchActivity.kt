@@ -12,8 +12,6 @@ import com.wen.android.mtabuscomparison.R
 import com.wen.android.mtabuscomparison.feature.search.SearchItemType
 import com.wen.android.mtabuscomparison.feature.search.SearchResultItem
 import com.wen.android.mtabuscomparison.ui.routesview.RoutesViewActivity
-import com.wen.android.mtabuscomparison.ui.stopmonitoring.SearchResultActivity
-import com.wen.android.mtabuscomparison.ui.stopmonitoring.StopMonitoringActivity
 import com.wen.android.mtabuscomparison.util.SearchHandler
 
 
@@ -46,12 +44,7 @@ class SearchActivity : AppCompatActivity(), SearchViewMvc.Listener {
     override fun onSearchResultClicked(searchResult: SearchResultItem) {
         when (searchResult.type) {
             SearchItemType.STOP -> {
-                val stopCodeArray = arrayOfNulls<String>(1)
-                stopCodeArray[0] = searchResult.stopId
-
-                val intent = Intent(this, StopMonitoringActivity::class.java)
-                intent.putExtra(Intent.EXTRA_TEXT, stopCodeArray)
-                startActivity(intent)
+                finishAndSearchStop(searchResult.stopId!!)
             }
             SearchItemType.MAP -> {
                 hideKeyboard(this)
@@ -63,6 +56,14 @@ class SearchActivity : AppCompatActivity(), SearchViewMvc.Listener {
                 finish()
             }
         }
+    }
+
+    private fun finishAndSearchStop(stopId: String) {
+        val stopCodeIntent = Intent().apply {
+            putExtra(getString(R.string.SEARCH_RESULT_STOP_CODE), stopId)
+        }
+        setResult(Activity.RESULT_OK, stopCodeIntent)
+        finish()
     }
 
     fun displaySearchResult(userInput: String) {
@@ -77,9 +78,7 @@ class SearchActivity : AppCompatActivity(), SearchViewMvc.Listener {
             if (stopcodeArray[0] == null) {
                 return
             }
-            val intent = Intent(this, SearchResultActivity::class.java)
-            intent.putExtra(Intent.EXTRA_TEXT, stopcodeArray)
-            startActivity(intent)
+            finishAndSearchStop(stopcodeArray[0]!!)
         } else {
             val routeEntered = userInput.toUpperCase()
             val intent = Intent(this, RoutesViewActivity::class.java)

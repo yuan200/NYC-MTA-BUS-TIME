@@ -2,7 +2,7 @@ package com.wen.android.mtabuscomparison.feature.favorite.storage.repo
 
 import com.wen.android.mtabuscomparison.BusApplication
 import com.wen.android.mtabuscomparison.feature.favorite.FavoriteStop
-import com.wen.android.mtabuscomparison.feature.stop.BusDatabase
+import com.wen.android.mtabuscomparison.feature.stopmonitoring.BusDatabase
 import kotlinx.coroutines.flow.Flow
 
 class DefaultFavoriteRepository : FavoriteRepository {

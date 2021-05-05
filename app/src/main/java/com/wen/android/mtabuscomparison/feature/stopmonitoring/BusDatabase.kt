@@ -1,4 +1,4 @@
-package com.wen.android.mtabuscomparison.feature.stop
+package com.wen.android.mtabuscomparison.feature.stopmonitoring
 
 import android.content.ContentValues
 import android.content.Context
@@ -12,8 +12,8 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.google.gson.Gson
 import com.wen.android.mtabuscomparison.BusApplication
-import com.wen.android.mtabuscomparison.feature.favorite.FavoriteStop
 import com.wen.android.mtabuscomparison.feature.favorite.FavoriteDao
+import com.wen.android.mtabuscomparison.feature.favorite.FavoriteStop
 import com.wen.android.mtabuscomparison.util.TimeConverts
 import com.wen.android.mtabuscomparison.util.getLongOrEmpty
 import com.wen.android.mtabuscomparison.util.getStringOrEmpty
@@ -24,7 +24,7 @@ import java.io.IOException
 @TypeConverters(TimeConverts::class)
 abstract class BusDatabase : RoomDatabase() {
 
-    abstract fun allBusDao(): StopDao
+    abstract fun busStopDao(): BusStopDao
 
     abstract fun favoriteStopDao(): FavoriteDao
 

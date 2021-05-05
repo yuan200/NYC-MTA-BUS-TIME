@@ -1,6 +1,5 @@
 package com.wen.android.mtabuscomparison.ui.favorite
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,64 +7,51 @@ import android.view.ViewAnimationUtils
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
-import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.wen.android.mtabuscomparison.BusApplication
 import com.wen.android.mtabuscomparison.R
 import com.wen.android.mtabuscomparison.databinding.FragmentFavoriteBinding
 import com.wen.android.mtabuscomparison.feature.favorite.Favorite
 import com.wen.android.mtabuscomparison.feature.favorite.FavoriteStop
-import com.wen.android.mtabuscomparison.feature.stop.BusDatabase
-import com.wen.android.mtabuscomparison.ui.stopmonitoring.StopMonitoringActivity
+import com.wen.android.mtabuscomparison.feature.stopmonitoring.BusDatabase
 import com.wen.android.mtabuscomparison.util.observe2
-import kotlinx.coroutines.CoroutineScope
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.*
 import kotlin.collections.ArrayList
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [FavoriteFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+@AndroidEntryPoint
 class FavoriteFragment : Fragment(), FavoriteAdapter.OnFavoriteClickedListener {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    private var mFab: FloatingActionButton? = null
-    private var mBusRecyclerView: RecyclerView? = null
-    private var mSaveStopView: LinearLayout? = null
     private var mAdapter: FavoriteAdapter? = null
-    var mFavorite: List<Favorite> = ArrayList()
-    private var FAVORITE_CHECKED = "favorite_checked"
-    private var DATABASE_ROW_ID = "row_id"
-    private var mBottomSheetBehavior: BottomSheetBehavior<FrameLayout?>? = null
-    private val viewModel: FavoriteViewModel by viewModels()
-    private lateinit var binding: FragmentFavoriteBinding
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private var _mBottomSheetBehavior: BottomSheetBehavior<FrameLayout?>? = null
+
+    private val mBottomSheetBehavior get() = _mBottomSheetBehavior!!
+
+    private val viewModel: FavoriteViewModel by viewModels()
+
+    private var _binding: FragmentFavoriteBinding? = null
+
+    private var mStopId = ""
+
+    private var mDescription = ""
+
+    //binding only valid between onCreatedView and onDestroyView
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -73,13 +59,11 @@ class FavoriteFragment : Fragment(), FavoriteAdapter.OnFavoriteClickedListener {
     ): View? {
         // Inflate the layout for this fragment
         Timber.i("onCreateView")
-        binding = FragmentFavoriteBinding.inflate(inflater, container, false)
+        _binding = FragmentFavoriteBinding.inflate(inflater, container, false)
         binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
         val view = binding.root
-        mBusRecyclerView = view.findViewById(R.id.bus_recycler_view)
-        mSaveStopView = view.findViewById(R.id.dodge_favorite_view)
-        mBusRecyclerView?.layoutManager = LinearLayoutManager(activity)
+        binding.busRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         val simpleItemTouchCallBack =
             object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
                 override fun onMove(
@@ -95,64 +79,44 @@ class FavoriteFragment : Fragment(), FavoriteAdapter.OnFavoriteClickedListener {
                 }
             }
         ItemTouchHelper(simpleItemTouchCallBack).apply {
-            attachToRecyclerView(mBusRecyclerView)
+            attachToRecyclerView(binding.busRecyclerView)
         }
 
-        mBottomSheetBehavior = BottomSheetBehavior.from(binding.favoriteBottomsheet).apply {
+        _mBottomSheetBehavior = BottomSheetBehavior.from(binding.favoriteBottomsheet).apply {
             state = BottomSheetBehavior.STATE_EXPANDED
             viewModel.setBackdropOpened(false)
-            mOnBackPressedCallback.isEnabled = false
+            mOnBackPressedCallback!!.isEnabled = false
         }
 
-        mFab = view.findViewById(R.id.fab)
-        mFab?.setOnClickListener {
-            mBottomSheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
-            mOnBackPressedCallback.isEnabled = true
+        binding.favoriteFab.setOnClickListener {
+            mBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            mOnBackPressedCallback!!.isEnabled = true
             viewModel.setBackdropOpened(true)
 
         }
 
         binding.favoriteCloseBackdrop.apply {
             setOnClickListener {
-                mBottomSheetBehavior?.state = BottomSheetBehavior.STATE_EXPANDED
-                mOnBackPressedCallback.isEnabled = false
+                mBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                mOnBackPressedCallback!!.isEnabled = false
                 viewModel.setBackdropOpened(false)
             }
         }
 
         binding.saveFavoriteSave.setOnClickListener {
-            val stopId = binding.saveFavoriteStopId.editText?.text.toString()
-            val description = binding.saveFavoriteStopDescription.editText?.text.toString()
+            mStopId = binding.saveFavoriteStopId.editText?.text.toString()
+            mDescription = binding.saveFavoriteStopDescription.editText?.text.toString()
 
-            if (stopId.isNullOrBlank()) {
+            if (mStopId.isNullOrBlank()) {
                 binding.saveFavoriteStopId.error = "Stop Id can not be empty"
                 return@setOnClickListener
             }
-
-            CoroutineScope(Dispatchers.IO).launch {
-                BusDatabase.getInstance(BusApplication.instance).favoriteStopDao()
-                    .insert(
-                        FavoriteStop(
-                            stopId,
-                            null,
-                            null,
-                            null,
-                            null,
-                            description.ifBlank { stopId },
-                            Date()
-                        )
-                    )
-            }
-            mBottomSheetBehavior?.state = BottomSheetBehavior.STATE_EXPANDED
-            mOnBackPressedCallback.isEnabled = false
-            viewModel.setBackdropOpened(false)
-            binding.saveFavoriteStopId.editText?.setText("")
-            binding.saveFavoriteStopDescription.editText?.setText("")
-
+            showProgress()
+            viewModel.onFetchingStopInfo(mStopId, getString(R.string.mta_bus_api_key))
         }
         activity?.onBackPressedDispatcher?.addCallback(
             viewLifecycleOwner,
-            mOnBackPressedCallback
+            mOnBackPressedCallback!!
         )
 
         return view
@@ -194,14 +158,26 @@ class FavoriteFragment : Fragment(), FavoriteAdapter.OnFavoriteClickedListener {
             if (it) Timber.i("true")
             else Timber.i("false")
         }
+
         viewModel.favoriteLiveData.observe(viewLifecycleOwner, {
             updateUI(it)
         })
+
+        viewModel.saveResult.observe(viewLifecycleOwner) {
+            if (it == "OK") {
+                onVerifyStopId()
+                viewModel.resetSaveResult()
+            } else if (it.isNotBlank()) {
+                Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
+                viewModel.resetSaveResult()
+            }
+            hideProgress()
+        }
     }
 
-    private val mOnBackPressedCallback = object : OnBackPressedCallback(false) {
+    private var mOnBackPressedCallback: OnBackPressedCallback? = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
-            mBottomSheetBehavior?.state = BottomSheetBehavior.STATE_EXPANDED
+            mBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             viewModel.setBackdropOpened(false)
             isEnabled = false
         }
@@ -223,46 +199,71 @@ class FavoriteFragment : Fragment(), FavoriteAdapter.OnFavoriteClickedListener {
             favorite.stopCode3 = bus.stopId3
             mFavoriteList.add(favorite)
         }
-        mFavorite = mFavoriteList
+        mFavoriteList
         return mFavoriteList
     }
 
     private fun updateUI(favoriteList: List<FavoriteStop>) {
         val favorites = getBusStopCode(favoriteList)
         mAdapter = FavoriteAdapter(favorites, this)
-        mBusRecyclerView!!.adapter = mAdapter
-    }
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment FavoriteFragment2.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            FavoriteFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+        binding.busRecyclerView.adapter = mAdapter
     }
 
     override fun oncFavoriteClicked(
-        stopCodeArray: Array<out String>?,
+        stopId: String,
         check: String?,
         rowId: String?
     ) {
-        val intent = Intent(activity, StopMonitoringActivity::class.java)
-        intent.putExtra(Intent.EXTRA_TEXT, stopCodeArray)
-        intent.putExtra(FAVORITE_CHECKED, "favorite_check")
-        intent.putExtra(DATABASE_ROW_ID, rowId)
-        startActivity(intent)
+        val action = FavoriteFragmentDirections
+            .actionFavoriteFragmentToStopMonitoringFragment(stopId).apply {
+                isFavorite = true
+                dbRowId = rowId?.toInt() ?: -1
+            }
+        findNavController().navigate(action)
+    }
+
+    override fun onDestroyView() {
+        binding.busRecyclerView.adapter = null
+        _mBottomSheetBehavior = null
+        _binding = null
+        super.onDestroyView()
+        Timber.v("onDestroyView")
+    }
+
+    private fun onVerifyStopId() {
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                BusDatabase.getInstance(BusApplication.instance).favoriteStopDao()
+                    .insert(
+                        FavoriteStop(
+                            mStopId,
+                            null,
+                            null,
+                            null,
+                            null,
+                            mDescription.ifBlank { mStopId },
+                            Date()
+                        )
+                    )
+            }
+        }
+        mBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        mOnBackPressedCallback!!.isEnabled = false
+        viewModel.setBackdropOpened(false)
+        binding.saveFavoriteStopId.editText?.setText("")
+        binding.saveFavoriteStopDescription.editText?.setText("")
+    }
+
+    private fun showProgress() {
+        binding.saveFavoriteSave.isEnabled = false
+        //todo indicator doesn't show before call hide()
+        binding.favoriteSaveProgressIndicator.hide()
+        binding.favoriteSaveProgressIndicator.show()
+    }
+
+    private fun hideProgress() {
+        binding.saveFavoriteSave.isEnabled = true
+        binding.favoriteSaveProgressIndicator.hide()
     }
 
 }

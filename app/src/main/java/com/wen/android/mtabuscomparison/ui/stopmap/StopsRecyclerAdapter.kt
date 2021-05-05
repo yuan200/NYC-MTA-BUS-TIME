@@ -3,7 +3,7 @@ package com.wen.android.mtabuscomparison.ui.stopmap
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.wen.android.mtabuscomparison.feature.stop.StopInfo
+import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopInfo
 import com.wen.android.mtabuscomparison.ui.stopmap.stoplistitem.StopsListItemViewMvc
 import com.wen.android.mtabuscomparison.ui.stopmap.stoplistitem.StopsListItemViewMvcImpl
 

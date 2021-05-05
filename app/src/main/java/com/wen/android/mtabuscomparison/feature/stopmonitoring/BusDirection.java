@@ -1,4 +1,4 @@
-package com.wen.android.mtabuscomparison.feature.stop;
+package com.wen.android.mtabuscomparison.feature.stopmonitoring;
 
 import java.util.List;
 

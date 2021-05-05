@@ -1,6 +1,7 @@
 package com.wen.android.mtabuscomparison.ui.commom.bottomsheet
 
 import android.content.Context
+import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
@@ -35,6 +36,10 @@ class GestureLockedBottomSheetBehavior<V: View>(context: Context, attributeSet: 
     ) { }
 
     override fun onStopNestedScroll(coordinatorLayout: CoordinatorLayout, child: V, target: View, type: Int) { }
+
+    override fun getInsetDodgeRect(parent: CoordinatorLayout, child: V, rect: Rect): Boolean {
+        return super.getInsetDodgeRect(parent, child, rect)
+    }
 
     override fun onNestedFling(
         coordinatorLayout: CoordinatorLayout,

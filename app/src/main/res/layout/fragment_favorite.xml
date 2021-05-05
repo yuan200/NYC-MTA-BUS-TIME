@@ -18,36 +18,43 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/dodge_favorite_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="?attr/colorPrimary"
             android:orientation="vertical">
 
-            <LinearLayout
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/favorite_my_station"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/grid_2"
+                android:layout_marginTop="@dimen/grid_0_5"
+                android:text="@string/My_Stations"
+                android:textAppearance="?attr/textAppearanceHeadline5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/favorite_close_backdrop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/grid_2"
+                android:paddingTop="@dimen/grid_1"
+                android:src="@drawable/ic_baseline_cancel_24"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/favorite_save_progress_indicator"
+                app:indicatorColor="?colorOnPrimary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/grid_2"
-                    android:layout_marginTop="@dimen/grid_0_5"
-                    android:layout_weight="1"
-                    android:text="@string/My_Stations"
-                    android:textAppearance="?attr/textAppearanceHeadline5" />
-
-                <ImageView
-                    android:id="@+id/favorite_close_backdrop"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_marginEnd="@dimen/grid_2"
-                    android:paddingTop="@dimen/grid_1"
-                    android:src="@drawable/ic_baseline_cancel_24" />
-            </LinearLayout>
+                app:showAnimationBehavior="outward"
+                android:indeterminate="true"
+                android:contentDescription="@string/save_favorite_progress_indicator"
+                app:layout_constraintTop_toBottomOf="@+id/favorite_my_station"/>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/save_favorite_stop_id"
@@ -57,6 +64,8 @@
                 android:layout_marginVertical="@dimen/grid_1_5"
                 android:hint="@string/enter_stop_id"
                 android:visibility="@{viewModel.backdropOpened  ? View.VISIBLE : View.INVISIBLE}"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/favorite_my_station"
                 app:startIconDrawable="@drawable/ic_favorite_pink_24dp">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -71,6 +80,8 @@
                 android:layout_marginHorizontal="@dimen/grid_2"
                 android:hint="@string/stop_description"
                 android:visibility="@{viewModel.backdropOpened ? View.VISIBLE : View.INVISIBLE}"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/save_favorite_stop_id"
                 app:startIconDrawable="@drawable/ic_favorite_pink_24dp">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -88,8 +99,11 @@
                 android:text="@string/save"
                 android:textAppearance="?attr/textAppearanceHeadline6"
                 app:backgroundTint="?attr/colorPrimaryDark"
-                app:elevation="4dp" />
-        </LinearLayout>
+                app:elevation="4dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/save_favorite_stop_description" />
+            
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <FrameLayout
             android:id="@+id/favorite_bottomsheet"
@@ -129,13 +143,13 @@
                     android:layout_height="wrap_content"
                     android:text="@string/empty_favorite_text"
                     android:textAppearance="?attr/textAppearanceHeadline6"
-                    app:layout_constraintTop_toBottomOf="@+id/favorite_empty_image"
                     app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"/>
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/favorite_empty_image" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/fab"
+                android:id="@+id/favorite_fab"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|end"

@@ -319,7 +319,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/data/opt/android-studio/plugins/android/lib/android.jar!/images/material/icons/materialicons/cancel/baseline_cancel_24.xml" />
+                                      <entry key="url" value="file:$USER_HOME$/Android/Sdk/icons/material/materialiconsround/directions_bus/round_directions_bus_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -329,9 +329,10 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="color" value="26a69a" />
-                            <entry key="outputName" value="ic_baseline_cancel_24" />
-                            <entry key="sourceFile" value="$USER_HOME$/Downloads/favorite-black-24dp.svg" />
+                            <entry key="assetSourceType" value="FILE" />
+                            <entry key="color" value="2651a6" />
+                            <entry key="outputName" value="ic_directions_bus_stop_48dp" />
+                            <entry key="sourceFile" value="$USER_HOME$/Downloads/directions_bus_stop_48dp.svg" />
                           </map>
                         </option>
                       </PersistentState>

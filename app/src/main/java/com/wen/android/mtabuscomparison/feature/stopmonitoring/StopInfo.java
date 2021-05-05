@@ -1,4 +1,4 @@
-package com.wen.android.mtabuscomparison.feature.stop;
+package com.wen.android.mtabuscomparison.feature.stopmonitoring;
 
 import android.location.Location;
 import androidx.annotation.NonNull;

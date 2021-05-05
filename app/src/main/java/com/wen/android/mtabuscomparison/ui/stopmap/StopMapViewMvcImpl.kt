@@ -22,7 +22,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.wen.android.mtabuscomparison.R
-import com.wen.android.mtabuscomparison.feature.stop.StopInfo
+import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopInfo
 import com.wen.android.mtabuscomparison.ui.commom.BaseObservableViewMvc
 import com.wen.android.mtabuscomparison.util.bitmapDescriptorFromVector
 import com.wen.android.mtabuscomparison.util.dpToPx
@@ -56,13 +56,15 @@ class StopMapViewMvcImpl(
     private var mSearchIcon: AppCompatImageView
     private var mSearchLayout: CardView
     private var mSearchHideBtn: AppCompatImageView
-
+    private var supportMapFragment: SupportMapFragment?
 
 
     init {
         setRootView(inflater.inflate(R.layout.fragment_stop_map, parent, false))
 
-        (fragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment).getMapAsync {
+        supportMapFragment = (fragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment)
+
+        supportMapFragment?.getMapAsync {
             mGoogleMap = it
             mGoogleMap.uiSettings.isMapToolbarEnabled = false
             mGoogleMap.setMapStyle(
@@ -256,15 +258,7 @@ class StopMapViewMvcImpl(
 
     override fun getSearchBar(): EditText = mSearchView
 
-    override fun onResume() {
-//        mAdview.resume()
-    }
-
-    override fun onPause() {
-//        mAdview.resume()
-    }
-
-    override fun onDestroy() {
-//        mAdview.destroy()
+    override fun onDestroyView() {
+        supportMapFragment?.onDestroy()
     }
 }

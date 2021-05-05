@@ -6,6 +6,7 @@ plugins {
     id 'com.google.firebase.crashlytics'
     id 'dagger.hilt.android.plugin'
     id "com.google.protobuf" version "0.8.12"
+    id "androidx.navigation.safeargs"
 }
 
 android {
@@ -105,6 +106,28 @@ android {
             throw new FileNotFoundException("Could not read and write version.properties")
     }
 
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+            if (project.hasProperty('testFilter')) {
+                List<String> props = project.getProperties().get("testFilter").split("\\s+")
+                props.each {
+                    def replaced = it
+                            .replaceFirst("^(MTA-BUS-TIME-COMPARISON/src/test.*/java/)(.+)\$", "**/\$2")
+                            .replace(".kt", ".class")
+                    project.logger.lifecycle("testFilter File: before=$it, after=$replaced")
+                    include(replaced)
+                }
+            }
+        }
+        unitTests {
+            includeAndroidResources = true
+            returnDefaultValues = true
+        }
+
+    }
+
+
     gradle.taskGraph.whenReady {
         taskGraph ->
             def taskReqStr = getGradle().getStartParameter().getTaskRequests().toString()
@@ -145,10 +168,14 @@ dependencies {
     implementation 'androidx.compose.runtime:runtime-rxjava2:1.0.0-beta01'
 
 
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.2.0'
+    def lifecycle_version = "2.4.0-alpha01"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
 
 
-    def nav_version = "2.3.4"
+
+    def nav_version = "2.3.5"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
     androidTestImplementation('androidx.test.espresso:espresso-core:3.3.0', {
@@ -156,7 +183,7 @@ dependencies {
     })
 
     implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'com.google.android.material:material:1.2.1'
+    implementation 'com.google.android.material:material:1.4.0-beta01'
     implementation 'androidx.vectordrawable:vectordrawable:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'androidx.cardview:cardview:1.0.0'
@@ -169,7 +196,9 @@ dependencies {
     implementation "com.google.android.gms:play-services-maps:$play_service_version"
     implementation "com.google.android.gms:play-services-places:$play_service_version"
     implementation "com.google.android.gms:play-services-location:$play_service_version"
-    implementation "com.google.android.gms:play-services-ads:19.7.0"
+    implementation "com.google.android.gms:play-services-ads:20.1.0"
+    implementation 'com.google.ads.mediation:mopub:5.16.4.0'
+
 
 
     def room_version = "2.2.6"
@@ -198,10 +227,12 @@ dependencies {
     //refrofit && okhttp
     // Note: 3.12.+ to support Android API 19
 
-    def version_okhttp = "3.12.10"
+
+    //HTTP
+    def version_okhttp = "4.9.0"
     implementation "com.squareup.okhttp3:okhttp:$version_okhttp"
     implementation "com.squareup.okhttp3:logging-interceptor:$version_okhttp"
-    def version_retrofit = "2.6.4"
+    def version_retrofit = "2.9.0"
     implementation "com.squareup.retrofit2:retrofit:$version_retrofit"
     implementation "com.squareup.retrofit2:converter-gson:$version_retrofit"
 //    testImplementation "com.squareup.retrofit2:retrofit-mock:$version_retrofit"
@@ -220,6 +251,23 @@ dependencies {
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7'
 
     implementation 'com.jakewharton.timber:timber:4.7.1'
+
+    //Testing
+    testImplementation "com.squareup.okhttp3:mockwebserver:4.9.0"
+    testImplementation "io.mockk:mockk:1.10.4"
+
+    //testing - jUnit5
+    def jupiter_version = "5.7.0"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$jupiter_version"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$jupiter_version"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:$jupiter_version"
+
+    def kotest_version = "4.3.2"
+    testImplementation "io.kotest:kotest-runner-junit5:$kotest_version"
+    testImplementation "io.kotest:kotest-assertions-core-jvm:$kotest_version"
+    testImplementation "io.kotest:kotest-property-jvm:$kotest_version"
+    androidTestImplementation "io.kotest:kotest-assertions-core-jvm:$kotest_version"
+    androidTestImplementation "io.kotest:kotest-property-jvm:$kotest_version"
 
     testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test:runner:1.1.0'

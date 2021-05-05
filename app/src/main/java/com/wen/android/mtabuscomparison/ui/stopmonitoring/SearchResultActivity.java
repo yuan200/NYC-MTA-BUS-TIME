@@ -25,10 +25,10 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.wen.android.mtabuscomparison.R;
 import com.wen.android.mtabuscomparison.feature.favorite.FavoriteStop;
-import com.wen.android.mtabuscomparison.feature.stop.BusDatabase;
-import com.wen.android.mtabuscomparison.feature.stop.StopMonitoringListItem;
-import com.wen.android.mtabuscomparison.netwoking.SiriApi;
-import com.wen.android.mtabuscomparison.netwoking.SiriService;
+import com.wen.android.mtabuscomparison.feature.stopmonitoring.BusDatabase;
+import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopMonitoringListItem;
+import com.wen.android.mtabuscomparison.netwoking.siri.SiriApiService;
+import com.wen.android.mtabuscomparison.netwoking.siri.SiriApi;
 import com.wen.android.mtabuscomparison.util.NetworkUtilities;
 
 import java.io.IOException;
@@ -39,6 +39,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.Executors;
+
+import retrofit2.Retrofit;
 
 public class SearchResultActivity extends AppCompatActivity {
 
@@ -56,7 +58,7 @@ public class SearchResultActivity extends AppCompatActivity {
     private final static String DATABASE_ROW_ID = "row_id";
     private long mRowID;
     private static int textViewIndicator;
-    private SiriService siriService;
+    private SiriApi siriApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +76,7 @@ public class SearchResultActivity extends AppCompatActivity {
         mBusTimeInfoView = (TextView) findViewById(R.id.bus_info_view_1);
         mRowID = 9999999;
 
-        siriService = new SiriApi().getSiriService();
+        siriApi = new SiriApiService(new Retrofit.Builder().build()).siri();
         final Intent intentThatStartedThisActivity = getIntent();
         if (intentThatStartedThisActivity.hasExtra(DATABASE_ROW_ID)) {
             mRowID = Long.parseLong(intentThatStartedThisActivity.getStringExtra(DATABASE_ROW_ID));
