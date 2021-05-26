@@ -1,11 +1,11 @@
 package com.wen.android.mtabuscomparison.data.mapper
 
 import com.wen.android.mtabuscomparison.data.remote.bustime.StopMonitoringResponse
-import com.wen.android.mtabuscomparison.feature.stopmonitoring.MonitoringData
+import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopMonitoringData
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopMonitoringListItem
 
 class ApiToUiMapper {
-    fun mapToStopMonitoring(response: StopMonitoringResponse, stopId: String): MonitoringData {
+    fun mapToStopMonitoring(response: StopMonitoringResponse, stopId: String): StopMonitoringData {
         //MonitoredStopVisit could be null if query a wrong stop number, ex: 141266
         val monitoringDelivery = response.Siri.ServiceDelivery.StopMonitoringDelivery[0]
         val monitoredVehicleList = monitoringDelivery.MonitoredStopVisit ?: emptyList()
@@ -43,7 +43,7 @@ class ApiToUiMapper {
         if (monitoringDelivery.ErrorCondition != null) {
             errorText = monitoringDelivery.ErrorCondition.Description
         }
-        return MonitoringData(stopId, situations, resultList, errorText)
+        return StopMonitoringData(stopId, situations, resultList, errorText)
     }
 
     private fun toCamelCase(str: String): String {

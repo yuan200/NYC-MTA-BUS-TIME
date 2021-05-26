@@ -15,7 +15,7 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.material.snackbar.Snackbar
 import com.wen.android.mtabuscomparison.R
-import com.wen.android.mtabuscomparison.feature.stopmonitoring.MonitoringData
+import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopMonitoringData
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopMonitoringListItem
 import com.wen.android.mtabuscomparison.ui.commom.BaseObservableViewMvc
 
@@ -71,8 +71,8 @@ class StopMonitoringViewMvcImpl(
         recyclerView.adapter = StopMonitoringAdapter(busMonitoring)
     }
 
-    override fun checkError(monitoringData: MonitoringData) {
-        if (monitoringData.situations != null) {
+    override fun checkError(stopMonitoringData: StopMonitoringData) {
+        if (stopMonitoringData.situations != null) {
             tooBar.visibility = View.VISIBLE
             findViewById<ImageView>(R.id.stop_monitoring_alert_img).apply {
                 visibility = View.VISIBLE
@@ -82,19 +82,19 @@ class StopMonitoringViewMvcImpl(
             mAlertView.bringToFront()
             mAlertView.setOnClickListener {
                 var alertSummary = ""
-                for (situation in monitoringData.situations.PtSituationElement) {
+                for (situation in stopMonitoringData.situations.PtSituationElement) {
                     alertSummary += situation.Description + "\n\n\n"
                 }
                 AlertDialog.Builder(getContext()).setMessage(alertSummary).create().show()
             }
         }
-        if (monitoringData.errorMessage.isNotEmpty()) {
+        if (stopMonitoringData.errorMessage.isNotEmpty()) {
             Snackbar.make(
                 findViewById(R.id.stop_monitoring_coordinator),
-                monitoringData.errorMessage,
+                stopMonitoringData.errorMessage,
                 Snackbar.LENGTH_LONG
             ).show()
-        } else if (monitoringData.busMonitoring.isEmpty()) {
+        } else if (stopMonitoringData.busMonitoring.isEmpty()) {
             Snackbar.make(
                 findViewById(R.id.stop_monitoring_coordinator),
                 "Sorry, MTA is not providing stop monitoring data for this stop right now:(",

@@ -32,8 +32,8 @@ import com.wen.android.mtabuscomparison.common.Result
 import com.wen.android.mtabuscomparison.databinding.ActivityStopMonitoringBinding
 import com.wen.android.mtabuscomparison.feature.favorite.FavoriteStop
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.BusDatabase
-import com.wen.android.mtabuscomparison.feature.stopmonitoring.MonitoringData
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.Stop
+import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopMonitoringData
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopMonitoringListItem
 import com.wen.android.mtabuscomparison.util.bitmapDescriptorFromVector
 import com.wen.android.mtabuscomparison.util.dpToPx
@@ -94,7 +94,7 @@ class StopMonitoringFragment : Fragment(),
         Timber.i("onViewCreated")
 
         repeatOnViewLifecycle(STARTED) {
-            mViewModel.stopMonitoringData.collect {
+            mViewModel.stopStopMonitoringData.collect {
                 when (it) {
                     Result.Loading -> {
 
@@ -102,7 +102,7 @@ class StopMonitoringFragment : Fragment(),
                     is Result.Success -> {
                             onStopMonitoringFetched(it.data)
                     }
-                    Result.Error -> {
+                    is Result.Failure -> {
 
                     }
                 }
@@ -145,7 +145,7 @@ class StopMonitoringFragment : Fragment(),
         }
 
         repeatOnViewLifecycle(STARTED) {
-            mViewModel.publishLineNames.collect {
+            mViewModel.publishedLineAdapterData.collect {
                 if (it.size > 0) {
                     binding.stopMonitoringBusCodeRv.adapter = BusCodeAdapter(it) { busCode ->
                         mViewModel.onPublishLineClicked(busCode)
@@ -330,13 +330,13 @@ class StopMonitoringFragment : Fragment(),
         super.onDestroyView()
     }
 
-    private fun onStopMonitoringFetched(monitoringData: MonitoringData) {
-        if (monitoringData.busMonitoring.isNotEmpty()) {
-            mStopIds.add(monitoringData.busMonitoring[0].stopNumber)
-            mStopPointName = monitoringData.busMonitoring[0].stopPointName
+    private fun onStopMonitoringFetched(stopMonitoringData: StopMonitoringData) {
+        if (stopMonitoringData.busMonitoring.isNotEmpty()) {
+            mStopIds.add(stopMonitoringData.busMonitoring[0].stopNumber)
+            mStopPointName = stopMonitoringData.busMonitoring[0].stopPointName
         }
-        checkError(monitoringData)
-        setAdapterData(monitoringData.busMonitoring)
+        checkError(stopMonitoringData)
+        setAdapterData(stopMonitoringData.busMonitoring)
     }
 
     fun addToFavorite() {
@@ -398,8 +398,8 @@ class StopMonitoringFragment : Fragment(),
         recyclerView.adapter = StopMonitoringAdapter(busMonitoring)
     }
 
-    fun checkError(monitoringData: MonitoringData) {
-        if (monitoringData.situations != null) {
+    fun checkError(stopMonitoringData: StopMonitoringData) {
+        if (stopMonitoringData.situations != null) {
             tooBar.visibility = View.VISIBLE
             binding.stopMonitoringAlertImg.apply {
                 visibility = View.VISIBLE
@@ -409,19 +409,19 @@ class StopMonitoringFragment : Fragment(),
             mAlertView.bringToFront()
             mAlertView.setOnClickListener {
                 var alertSummary = ""
-                for (situation in monitoringData.situations.PtSituationElement) {
+                for (situation in stopMonitoringData.situations.PtSituationElement) {
                     alertSummary += situation.Description + "\n\n\n"
                 }
                 AlertDialog.Builder(requireContext()).setMessage(alertSummary).create().show()
             }
         }
-        if (monitoringData.errorMessage.isNotEmpty()) {
+        if (stopMonitoringData.errorMessage.isNotEmpty()) {
             Snackbar.make(
                 binding.stopMonitoringCoordinator,
-                monitoringData.errorMessage,
+                stopMonitoringData.errorMessage,
                 Snackbar.LENGTH_LONG
             ).show()
-        } else if (monitoringData.busMonitoring.isEmpty()) {
+        } else if (stopMonitoringData.busMonitoring.isEmpty()) {
             Snackbar.make(
                 binding.stopMonitoringCoordinator,
                 "Sorry, MTA is not providing stop monitoring data for this stop right now:(",
