@@ -4,10 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wen.android.mtabuscomparison.util.coroutine.DefaultDispatcherProvider
 import com.wen.android.mtabuscomparison.util.coroutine.DispatcherProvider
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.launchIn
 import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
@@ -39,4 +38,6 @@ abstract class BusViewModel constructor(
             Timber.w(e, "launch()ed coroutine was canceled (scope=%s).", scope)
         }
     }
+
+    fun <T> Flow<T>.launchInViewModel() = this.launchIn(viewModelScope + dispatcherProvider.Default)
 }

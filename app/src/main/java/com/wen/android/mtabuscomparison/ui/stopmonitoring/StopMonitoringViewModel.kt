@@ -8,20 +8,23 @@ import com.wen.android.mtabuscomparison.common.Result
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.Stop
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopMonitoringData
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.storage.repo.StopMonitoringRepository
+import com.wen.android.mtabuscomparison.util.coroutine.DispatcherProvider
 import com.wen.android.mtabuscomparison.util.viewmodel.BusViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
 class StopMonitoringViewModel
 @Inject constructor(
+    dispatcherProvider: DispatcherProvider,
     private val repository: StopMonitoringRepository,
     savedStateHandle: SavedStateHandle
-) : BusViewModel() {
+) : BusViewModel(dispatcherProvider = dispatcherProvider) {
     /**
      * what do I need in this view model
      * + stopId -- getting from saveStateHandle
@@ -34,7 +37,7 @@ class StopMonitoringViewModel
 
     private val vehicleLocations: MutableMap<String, LatLng> = Collections.synchronizedMap(HashMap())
 
-    //todo handle case when stop in not in local db
+    //todo handle case when stop is not in local db
     val stop: StateFlow<Stop?> by lazy {
         repository.stop(savedStateHandle["stopId"]!!)
             .filterNotNull()
@@ -55,8 +58,8 @@ class StopMonitoringViewModel
     val vehicleAndStopBounds: SharedFlow<LatLngBounds> = _vehicleAndStopBounds
 
 
-    private val _stopStopMonitoringData: MutableSharedFlow<Result<StopMonitoringData>> = MutableSharedFlow(replay = 1)
-    val stopStopMonitoringData: SharedFlow<Result<StopMonitoringData>> = _stopStopMonitoringData
+    private val _stopStopMonitoringData: MutableStateFlow<Result<StopMonitoringData>> = MutableStateFlow(Result.Loading)
+    val stopStopMonitoringData: StateFlow<Result<StopMonitoringData>> = _stopStopMonitoringData
 
 
     private val _publishedLineAdapterData: MutableStateFlow<MutableList<String>> = MutableStateFlow(mutableListOf())
@@ -72,12 +75,16 @@ class StopMonitoringViewModel
     }
 
     private suspend fun fetchStopMonitoring(key: String, stopId: String) {
-        repository.stopMonitoring(key, stopId).collect {
-            _stopStopMonitoringData.emit(it)
-            if (it is Result.Success) {
-                handleStopMonitoring(it.data)
-            }
-        }
+        repository.stopMonitoring(key, stopId)
+            .onEach {
+                Timber.v("emit $it")
+                println("emit $it")
+                _stopStopMonitoringData.emit(it)
+                if (it is Result.Success) {
+                    handleStopMonitoring(it.data)
+                }
+            }.launchInViewModel()
+
     }
 
     /**

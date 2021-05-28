@@ -27,4 +27,5 @@
     <string name="SEARCH_RESULT_STOP_CODE">search_result_stop_code</string>
     <string name="leak_canary_test_class_name">assertk.Assert</string>
     <string name="save_favorite_progress_indicator">save favorite progress indicator</string>
+    <string name="progress_bar">progress bar</string>
 </resources>

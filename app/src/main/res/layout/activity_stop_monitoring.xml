@@ -106,23 +106,30 @@
                 android:layout_gravity="bottom"
                 app:layout_dodgeInsetEdges="bottom" />
 
-            <FrameLayout
+            <LinearLayout
                 android:id="@+id/stop_monitoring_bs_container"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:orientation="vertical"
                 android:background="?colorSurface"
                 app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
                 app:behavior_hideable="false"
                 app:behavior_peekHeight="150dp"
                 app:layout_insetEdge="bottom" >
 
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/stop_monitoring_progress_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp"
+                    android:indeterminate="true"
+                    android:contentDescription="@string/progress_bar"/>
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/stop_monitoring_recycler_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     tools:itemCount="3"
                     tools:listitem="@layout/stop_monitoring_list_item" />
-            </FrameLayout>
+            </LinearLayout>
 
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>

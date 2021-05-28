@@ -97,12 +97,18 @@ class StopMonitoringFragment : Fragment(),
             mViewModel.stopStopMonitoringData.collect {
                 when (it) {
                     Result.Loading -> {
+                        Timber.v("stopMonitoringData received loading")
+                        binding.stopMonitoringProgressBar.show()
 
                     }
                     is Result.Success -> {
-                            onStopMonitoringFetched(it.data)
+                        Timber.v("stopMonitoringData received success")
+                        onStopMonitoringFetched(it.data)
+                        binding.stopMonitoringProgressBar.hide()
                     }
                     is Result.Failure -> {
+                        Timber.v("stopMonitoringData received failure")
+                        binding.stopMonitoringProgressBar.hide()
 
                     }
                 }
@@ -122,19 +128,9 @@ class StopMonitoringFragment : Fragment(),
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         val adRequest = AdRequest.Builder().build()
-//        mAdview = binding.stopMonitoringAd.apply {
-//            loadAd(adRequest)
-//        }
-//        mAdview = AdView(requireContext().applicationContext).apply {
-//        }
-//        mAdview.adSize = AdSize.BANNER
-//        mAdview.adUnitId = getString(R.string.app_unit_id_stop_monitoring)
-//        binding.stopMonitoringAdContainer.addView(mAdview)
+
         mAdview = binding.stopMonitoringAd
         mAdview.loadAd(adRequest)
-
-
-
 
         mRowId = args.dbRowId
         setFavorite(args.isFavorite)

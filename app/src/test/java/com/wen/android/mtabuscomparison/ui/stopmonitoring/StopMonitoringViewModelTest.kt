@@ -1,11 +1,14 @@
 package com.wen.android.mtabuscomparison.ui.stopmonitoring
 
 import androidx.lifecycle.SavedStateHandle
+import app.cash.turbine.test
 import com.wen.android.mtabuscomparison.common.Result
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.Stop
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopMonitoringData
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopMonitoringListItem
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.storage.repo.StopMonitoringRepository
+import com.wen.android.mtabuscomparison.testhelper.extensions.CoroutineTestRule
+import com.wen.android.mtabuscomparison.testhelper.extensions.TestDispatcherProvider
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.beInstanceOf
@@ -13,14 +16,21 @@ import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
+import org.junit.Rule
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import kotlin.time.ExperimentalTime
 
+@ExperimentalTime
 internal class StopMonitoringViewModelTest {
+
+    @get:Rule
+    var coroutineTestResult = CoroutineTestRule()
 
     @MockK
     lateinit var viewModel: StopMonitoringViewModel
@@ -40,19 +50,18 @@ internal class StopMonitoringViewModelTest {
     fun setUp() {
         MockKAnnotations.init(this)
 
-        stop = Stop("stopId", "stopName", 0.0, 0.0, "routeId")
+        stop = Stop("400555", "E 32 ST/5 AV", 0.0, 0.0, "routeId")
 
         every { apiResult.busMonitoring } returns listOf(StopMonitoringListItem().apply {
             publishedLineName = "publishLineName"
         })
         every { savedStateHandle.get(any()) as String? } returns ""
-        coEvery { repository.stop(any()) } returns flow { emit(stop) }
-        coEvery { repository.stopMonitoring(any(), any()) } returns flow {
-            emit(Result.Loading)
+        coEvery { repository.stopMonitoring(any(), "400555") } returns flow {
             emit(Result.Success(apiResult))
         }
 
         viewModel = StopMonitoringViewModel(
+            TestDispatcherProvider(),
             repository,
             savedStateHandle
         )
@@ -63,23 +72,50 @@ internal class StopMonitoringViewModelTest {
     }
 
     @Test
-    fun `load stop monitoring data should update flow`() {
+    fun `stop flow should return data from repository`() = runBlockingTest {
+        coEvery { repository.stop(any()) } returns flow { emit(stop) }
+
         viewModel.apply {
-            loadStopMonitoringData("key", "400555")
-
-            runBlocking {
-                launch {
-                    val result = stopStopMonitoringData.take(2).toList()
-                    result[1] should beInstanceOf<Result.Loading>()
-                    result[0] should beInstanceOf<Result.Success<StopMonitoringData>>()
-                    (result[0] as Result.Success).data.busMonitoring[0].publishedLineName shouldBe "publishLineName"
-                }
-
-                //drop 1 because first value is an initial null value
-                publishedLineAdapterData.drop(1).first()[0] shouldBe "publishLineName"
+            stop.test {
+                expectItem()?.stopId shouldBe "400555"
+                cancelAndIgnoreRemainingEvents()
             }
         }
     }
+
+    @Test
+    fun `load stop monitoring data should update flow`() = runBlockingTest {
+        viewModel.apply {
+            loadStopMonitoringData("key", "400555")
+
+            stopStopMonitoringData.test {
+                expectItem() should beInstanceOf<Result.Success<StopMonitoringData>>()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            launch {
+                publishedLineAdapterData.test {
+                    expectItem() shouldBe "publishLineName"
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `load stop monitoring data should returns error result`() = runBlockingTest {
+
+        coEvery { repository.stopMonitoring(any(), "error") } returns flow {
+            emit(Result.Failure("error message"))
+        }
+        viewModel.apply {
+            loadStopMonitoringData("key", "error")
+
+            stopStopMonitoringData.test {
+                expectItem() should beInstanceOf<Result.Failure>()
+            }
+        }
+    }
+
 
     @Test
     fun `on publish line clicked`() {

@@ -3,6 +3,7 @@ package com.wen.android.mtabuscomparison.util.coroutine
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
 
+@Suppress("PropertyName")
 interface DispatcherProvider {
     val Default: CoroutineContext
         get() = Dispatchers.Default

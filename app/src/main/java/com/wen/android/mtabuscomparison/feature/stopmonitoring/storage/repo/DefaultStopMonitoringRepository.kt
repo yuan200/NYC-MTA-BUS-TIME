@@ -34,10 +34,6 @@ class DefaultStopMonitoringRepository
                 }.flowOn(Dispatchers.IO)
             }
 
-            flow {
-                emit(Result.Loading)
-            }
-
             val response = siriApiService.siri().stopMonitoring(key, monitoringRef)
             if (!response.isSuccessful) throw HttpException(response)
 
