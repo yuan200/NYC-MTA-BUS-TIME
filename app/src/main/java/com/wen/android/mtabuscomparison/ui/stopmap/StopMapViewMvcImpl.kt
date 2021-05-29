@@ -1,6 +1,7 @@
 package com.wen.android.mtabuscomparison.ui.stopmap
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.location.Location
 import android.view.LayoutInflater
@@ -231,6 +232,7 @@ class StopMapViewMvcImpl(
 
     override fun getFocusStop() = mCurrentFocusStop
 
+    @SuppressLint("ResourceType")
     override fun enableMyLocationButton() {
         if (ActivityCompat.checkSelfPermission(
                 getContext(),
@@ -241,7 +243,7 @@ class StopMapViewMvcImpl(
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             mGoogleMap.isMyLocationEnabled = true
-            (fragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment).view!!.findViewById<View>(
+            (fragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment).requireView().findViewById<View>(
                 0x2
             ).apply {
                 val params = layoutParams as RelativeLayout.LayoutParams

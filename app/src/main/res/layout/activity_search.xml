@@ -30,7 +30,8 @@
                 android:inputType="textCapWords"
                 android:background="@null"
                 android:hint="@string/search_hint"
-                android:textAppearance="?attr/textAppearanceSubtitle0"/>
+                android:textAppearance="?attr/textAppearanceSubtitle0"
+                tools:ignore="Autofill" />
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 

@@ -32,7 +32,9 @@ import com.wen.android.mtabuscomparison.ui.stopmap.StopMapViewMvc.*
 import com.wen.android.mtabuscomparison.ui.stopmonitoring.StopMonitoringActivity
 import com.wen.android.mtabuscomparison.util.SearchHandler
 import timber.log.Timber
+import java.util.*
 import java.util.concurrent.Executors
+import kotlin.collections.ArrayList
 
 /**
  * Created by yuan on 4/10/2017.
@@ -122,7 +124,7 @@ class StopMapFragment : Fragment(), OnMovedMapListener, Listener, OnStartSearchL
             intent.putExtra(Intent.EXTRA_TEXT, stopcodeArray)
             startActivity(intent)
         } else {
-            val routeEntered = userInput.toUpperCase()
+            val routeEntered = userInput.toUpperCase(Locale.US)
             val intent = Intent(activity, RoutesViewActivity::class.java)
             intent.putExtra(Intent.EXTRA_TEXT, routeEntered)
             startActivity(intent)

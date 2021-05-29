@@ -17,8 +17,6 @@
 
 <!--    Backgrounds-->
     <color name="whiteBackground">#eef0f2</color>
-    <color name="colorTransparent">#FFFFFF</color>
 
-    <color name="stop_monitoring_vew_text_red">#ffa08f</color>
     <color name="yellowLightColor">#ffe54c</color>
 </resources>

@@ -109,7 +109,7 @@ public class RoutesViewActivity extends AppCompatActivity {
         protected void onPostExecute(BusDirection s) {
           //  String errorChecking = mBusRoute0.get(0).getId();
             if (s == null){
-                mExpandableButton.setText("Sorry, we are unable to track the bus you asked");
+                mExpandableButton.setText(getString(R.string.error_unable_to_track));
                 mExpandableButton.setEnabled(false);
                 mExpandableButton1.setVisibility(View.GONE);
                 mExpandableButton1.setEnabled(false);

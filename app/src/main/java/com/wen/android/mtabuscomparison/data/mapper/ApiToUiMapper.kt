@@ -3,6 +3,7 @@ package com.wen.android.mtabuscomparison.data.mapper
 import com.wen.android.mtabuscomparison.data.remote.bustime.StopMonitoringResponse
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopMonitoringData
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopMonitoringListItem
+import java.util.*
 
 class ApiToUiMapper {
     fun mapToStopMonitoring(response: StopMonitoringResponse, stopId: String): StopMonitoringData {
@@ -51,7 +52,7 @@ class ApiToUiMapper {
         for (s in str.split(" ")) {
             if (s.length > 1 || s == "AV") {
                 sb.append(s[0])
-                sb.append(s.substring(1).toLowerCase())
+                sb.append(s.substring(1).toLowerCase(Locale.US))
                 sb.append(" ")
             } else {
                 sb.append(s)

@@ -18,14 +18,14 @@
                 android:id="@+id/route_stop_intersection"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="20dp"
+                android:textSize="20sp"
                 android:padding="16dp"/>
 
             <TextView
                 android:id="@+id/route_stop_stopcode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
                 android:visibility="visible"/>
         </RelativeLayout>
     </androidx.cardview.widget.CardView>

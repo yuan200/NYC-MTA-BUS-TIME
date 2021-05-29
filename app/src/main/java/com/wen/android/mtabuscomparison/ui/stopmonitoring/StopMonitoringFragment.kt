@@ -185,6 +185,7 @@ class StopMonitoringFragment : Fragment(),
                         }
                         setMapPaddingBottom(slideOffset, maxPadding)
                     }
+                    else -> {}
                 }
             }
 

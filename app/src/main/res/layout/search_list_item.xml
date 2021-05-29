@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
@@ -18,7 +17,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:paddingLeft="@dimen/grid_2"
+            android:paddingStart="@dimen/grid_2"
+            android:contentDescription="@string/search_result_type"
             android:src="@{itemType == com.wen.android.mtabuscomparison.feature.search.SearchItemType.MAP ? @drawable/ic_baseline_map_24 : @drawable/ic_bus_blue_24dp}" />
 
         <TextView
@@ -27,6 +27,7 @@
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
             android:clickable="true"
+            android:focusable="true"
             android:paddingHorizontal="@dimen/grid_2"
             android:paddingVertical="@dimen/grid_1"
             android:textAppearance="?attr/textAppearanceHeadline5"

@@ -13,6 +13,7 @@ import com.wen.android.mtabuscomparison.feature.search.SearchItemType
 import com.wen.android.mtabuscomparison.feature.search.SearchResultItem
 import com.wen.android.mtabuscomparison.ui.routesview.RoutesViewActivity
 import com.wen.android.mtabuscomparison.util.SearchHandler
+import java.util.*
 
 
 class SearchActivity : AppCompatActivity(), SearchViewMvc.Listener {
@@ -80,7 +81,7 @@ class SearchActivity : AppCompatActivity(), SearchViewMvc.Listener {
             }
             finishAndSearchStop(stopcodeArray[0]!!)
         } else {
-            val routeEntered = userInput.toUpperCase()
+            val routeEntered = userInput.toUpperCase(Locale.US)
             val intent = Intent(this, RoutesViewActivity::class.java)
             intent.putExtra(Intent.EXTRA_TEXT, routeEntered)
             startActivity(intent)

@@ -39,7 +39,7 @@ class StopMonitoringViewHolder(
             text = item.destinationName
         }
         expectedArriveTime.apply {
-            text = "arrival time: ${item.expectedArrivalTime.getTime()}"
+            "arrival time: ${item.expectedArrivalTime.getTime()}".also { text = it }
             visibility = if (item.expectedArrivalTime.isNullOrEmpty()) View.GONE else View.VISIBLE
         }
 

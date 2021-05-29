@@ -2,22 +2,14 @@
     <string name="app_name">MTA BUS TIME</string>
     <string name="title_search">Search</string>
     <string name="title_favorite">Favorite</string>
-    <string name="title_nearby">Help</string>
-    <string name="search">Search</string>
-    <string name="clear_search">Clear Search</string>
-    <string name="favorite_check">favorite_check</string>
     <string name="lorem_m">Lorem ipsum dolor sit amet, consectetur adipiscing elit</string>
     <string name="lorem_s">Lorem ipsum</string>
     <string name="test_stop_name">W 34 ST/5AV</string>
     <string name="service_advisory">Service advisory</string>
     <string name="search_hint">  Search address, route or stop number</string>
     <string name="SEARCH_RESULT_POINT">SEARCH_RESULT</string>
-    <string name="ad_unit_location_stop_map">stop_map</string>
-    <string name="preference_key_ad_unit">ad_units</string>
-    <string name="ad_unit_location_stop_monitoring">stop_monitoring</string>
     <string name="test_route_number">M34+ M34A+ QM4 QM5</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="enter_stop_id">Stop Id</string>
     <string name="My_Stations">My Stations</string>
     <string name="stop_description">Description</string>
@@ -28,4 +20,10 @@
     <string name="leak_canary_test_class_name">assertk.Assert</string>
     <string name="save_favorite_progress_indicator">save favorite progress indicator</string>
     <string name="progress_bar">progress bar</string>
+    <string name="cancel_save_favorite">cancel save favorite</string>
+    <string name="save_favorite_stop_button">save favorite stop button</string>
+    <string name="search_result_type">search result type</string>
+    <string name="time_min">min</string>
+    <string name="enter_route_number_or_stop_number">Enter route number or stop number</string>
+    <string name="error_unable_to_track">Sorry, we are unable to track the bus you asked</string>
 </resources>

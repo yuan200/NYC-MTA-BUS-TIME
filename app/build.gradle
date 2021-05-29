@@ -139,6 +139,17 @@ android {
                 }
             }
     }
+
+    lintOptions {
+        disable "LogNotTimber",
+                "StringFormatInTimber",
+                "ThrowableNotAtBeginning",
+                "BinaryOperationInTimber",
+                "TimberArgCount",
+                "TimberArgTypes",
+                "TimberTagLength",
+                "TimberExceptionLogging"
+    }
 }
 configurations.all {
     resolutionStrategy.force "org.antlr:antlr4-runtime:4.7.1"

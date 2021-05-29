@@ -2,6 +2,7 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -21,7 +22,8 @@
                 android:name="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                tools:ignore="FragmentTagUsage" />
 
 
             <androidx.recyclerview.widget.RecyclerView
@@ -54,15 +56,17 @@
                     android:layout_height="40dp"
                     android:layout_toStartOf="@+id/search_hide_btn"
                     android:layout_toEndOf="@+id/search_icon"
-                    android:hint="Enter route number or stop number"
+                    android:hint="@string/enter_route_number_or_stop_number"
                     android:imeOptions="actionSearch"
-                    android:inputType="text" />
+                    android:inputType="text"
+                    tools:ignore="Autofill" />
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/search_hide_btn"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
                     android:clickable="true"
+                    android:focusable="true"
                     app:srcCompat="@drawable/ic_arrow_right_alt_black_18dp"/>
             </RelativeLayout>
         </androidx.cardview.widget.CardView>

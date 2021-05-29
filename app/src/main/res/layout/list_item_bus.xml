@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clickable="true"
+        android:focusable="true"
         app:cardCornerRadius="0dp">
 
         <RelativeLayout
@@ -34,8 +35,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/item_stop_name"
-                android:layout_alignLeft="@+id/item_stop_name"
-                android:layout_marginRight="@dimen/grid_2"
+                android:layout_alignStart="@+id/item_stop_name"
+                android:layout_marginEnd="@dimen/grid_2"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
                 tools:text="@string/test_route_number"/>
 

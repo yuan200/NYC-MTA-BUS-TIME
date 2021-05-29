@@ -29,6 +29,7 @@
                 android:layout_marginTop="12dp"
                 android:layout_marginEnd="16dp"
                 android:clickable="true"
+                android:focusable="true"
                 app:srcCompat="@drawable/ic_favorite_border_pink_24dp" />
         </androidx.appcompat.widget.Toolbar>
 
@@ -60,7 +61,7 @@
                             android:id="@+id/stop_monitoring_alert_img"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
-                            android:layout_marginLeft="16dp"
+                            android:layout_marginStart="16dp"
                             android:visibility="gone"
                             app:srcCompat="@drawable/ic_warning_amber_black_24dp"
                             tools:visibility="visible" />
@@ -69,8 +70,8 @@
                             android:id="@+id/stop_monitoring_stop_advisory"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginRight="16dp"
-                            android:paddingLeft="0dp"
+                            android:layout_marginEnd="16dp"
+                            android:paddingStart="0dp"
                             android:text="@string/service_advisory"
                             android:textColor="@color/yellowLightColor"
                             android:textSize="22sp"
@@ -82,14 +83,14 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="start"
-                            android:layout_marginLeft="16dp"
+                            android:layout_marginStart="16dp"
                             android:layout_marginTop="16dp" />
                     </LinearLayout>
 
                 </androidx.appcompat.widget.Toolbar>
             </com.google.android.material.appbar.AppBarLayout>
 
-            <fragment
+            <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/stop_monitoring_map"
                 class="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="match_parent"
@@ -142,7 +143,6 @@
                 android:id="@+id/stop_monitoring_ad"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
                 android:layout_gravity="bottom|center"
                 app:adSize="BANNER"
                 app:adUnitId="@string/app_unit_id_stop_monitoring"/>

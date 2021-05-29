@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.wen.android.mtabuscomparison">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -13,10 +14,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        tools:ignore="AllowBackup">
         <activity
             android:name=".LauncherActivity"
-            android:theme="@style/AppTheme.Launcher">
+            android:theme="@style/AppTheme.Launcher"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -36,8 +39,6 @@
             android:name="org.apache.http.legacy"
             android:required="false" />
 
-        <activity android:name=".ui.stopmonitoring.SearchResultActivity" />
-        <activity android:name=".ui.favorite.SaveFavorite" />
         <activity android:name=".ui.routesview.RoutesViewActivity" />
 
         <meta-data

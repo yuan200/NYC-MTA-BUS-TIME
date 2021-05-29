@@ -43,6 +43,7 @@
                 android:layout_marginEnd="@dimen/grid_2"
                 android:paddingTop="@dimen/grid_1"
                 android:src="@drawable/ic_baseline_cancel_24"
+                android:contentDescription="@string/cancel_save_favorite"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -133,6 +134,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:src="@drawable/twotone_no_transfer_24"
+                    android:contentDescription="@string/empty_favorite_text"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -155,6 +157,7 @@
                 android:layout_gravity="bottom|end"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="56dp"
+                android:contentDescription="@string/save_favorite_stop_button"
                 app:srcCompat="@android:drawable/ic_input_add" />
 
             <View

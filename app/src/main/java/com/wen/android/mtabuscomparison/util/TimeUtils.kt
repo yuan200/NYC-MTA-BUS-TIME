@@ -5,7 +5,7 @@ import java.util.*
 
 class TimeUtils {
     companion object {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US)
     }
 }
 

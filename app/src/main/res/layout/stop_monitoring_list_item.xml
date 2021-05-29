@@ -24,7 +24,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:text="TextView"
         android:textColor="@color/primaryTextColor"
         android:textAppearance="?textAppearanceHeadline4"
         app:layout_constraintStart_toStartOf="parent"
@@ -139,7 +138,7 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="min"
+        android:text="@string/time_min"
         android:textColor="@color/primaryTextColor"
         app:layout_constraintBaseline_toBaselineOf="@+id/live_minute"
         app:layout_constraintStart_toEndOf="@+id/live_minute" />
