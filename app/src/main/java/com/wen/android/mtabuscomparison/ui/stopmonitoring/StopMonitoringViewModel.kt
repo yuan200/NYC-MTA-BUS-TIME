@@ -51,7 +51,7 @@ class StopMonitoringViewModel
     private val _targetPublishedLineName: MutableStateFlow<String> = MutableStateFlow("")
     val targetPublishedLineName: StateFlow<String> = _targetPublishedLineName
 
-    private val _targetVehicleLocation: MutableSharedFlow<LatLng> = MutableSharedFlow()
+    private val _targetVehicleLocation: MutableSharedFlow<LatLng> = MutableSharedFlow(replay = 1)
     val targetVehicleLocation: SharedFlow<LatLng> = _targetVehicleLocation
 
     private val _vehicleAndStopBounds: MutableSharedFlow<LatLngBounds> = MutableSharedFlow()
