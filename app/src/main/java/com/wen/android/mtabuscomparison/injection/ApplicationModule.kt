@@ -1,7 +1,7 @@
 package com.wen.android.mtabuscomparison.injection
 
+import android.content.Context
 import com.wen.android.mtabuscomparison.BuildConfig
-import com.wen.android.mtabuscomparison.BusApplication
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.BusDatabase
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.BusStopDao
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.storage.repo.DefaultStopMonitoringRepository
@@ -9,6 +9,7 @@ import com.wen.android.mtabuscomparison.feature.stopmonitoring.storage.repo.Stop
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -47,9 +48,9 @@ class ApplicationModule {
 
     @Provides
     @Singleton
-    fun provideStopDB(): BusStopDao {
+    fun provideStopDB(@ApplicationContext context: Context): BusStopDao {
         return BusDatabase
-            .getInstance(BusApplication.instance)
+            .getInstance(context)
             .busStopDao()
     }
 }

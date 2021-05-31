@@ -1,10 +1,6 @@
 package com.wen.android.mtabuscomparison.feature.ad
 
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
-import com.google.gson.Gson
-import com.wen.android.mtabuscomparison.BusApplication
-import com.wen.android.mtabuscomparison.R
+import com.wen.android.mtabuscomparison.BaseApp
 import com.wen.android.mtabuscomparison.data.proto.AdUnitSerializer.adUnitDataStore
 import com.wen.android.mtabuscomparison.data.remote.ad.AdUnitProtos
 import com.wen.android.mtabuscomparison.data.remote.ad.AdUnitResponse
@@ -31,7 +27,7 @@ class FetchAdUnitUseCase @Inject constructor(
                 ) {
                     if (response.isSuccessful && response.body() != null) {
                         CoroutineScope(Dispatchers.IO).launch {
-                            val context = BusApplication.instance.applicationContext
+                            val context = BaseApp.instance.applicationContext
                             context.adUnitDataStore.updateData { currentAdUnits ->
                                 currentAdUnits.toBuilder()
                                     .clearAdUnits()

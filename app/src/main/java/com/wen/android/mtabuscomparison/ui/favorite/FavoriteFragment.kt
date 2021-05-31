@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.wen.android.mtabuscomparison.BusApplication
+import com.wen.android.mtabuscomparison.BaseApp
 import com.wen.android.mtabuscomparison.R
 import com.wen.android.mtabuscomparison.databinding.FragmentFavoriteBinding
 import com.wen.android.mtabuscomparison.feature.favorite.Favorite
@@ -233,7 +233,7 @@ class FavoriteFragment : Fragment(), FavoriteAdapter.OnFavoriteClickedListener {
     private fun onVerifyStopId() {
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                BusDatabase.getInstance(BusApplication.instance).favoriteStopDao()
+                BusDatabase.getInstance(BaseApp.instance).favoriteStopDao()
                     .insert(
                         FavoriteStop(
                             mStopId,

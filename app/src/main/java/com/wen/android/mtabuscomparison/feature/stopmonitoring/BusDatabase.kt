@@ -11,7 +11,7 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.google.gson.Gson
-import com.wen.android.mtabuscomparison.BusApplication
+import com.wen.android.mtabuscomparison.BaseApp
 import com.wen.android.mtabuscomparison.feature.favorite.FavoriteDao
 import com.wen.android.mtabuscomparison.feature.favorite.FavoriteStop
 import com.wen.android.mtabuscomparison.util.TimeConverts
@@ -66,7 +66,7 @@ abstract class BusDatabase : RoomDatabase() {
                 """.trimIndent())
 
                 database.beginTransaction();
-                insertList(getListFromFile(BusApplication.instance, "stop/stops.json"), database)
+                insertList(getListFromFile(BaseApp.instance, "stop/stops.json"), database)
                 database.setTransactionSuccessful()
                 database.endTransaction()
             }

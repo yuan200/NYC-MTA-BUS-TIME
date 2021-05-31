@@ -29,7 +29,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import com.wen.android.mtabuscomparison.R
 import com.wen.android.mtabuscomparison.common.Result
-import com.wen.android.mtabuscomparison.databinding.ActivityStopMonitoringBinding
+import com.wen.android.mtabuscomparison.databinding.FragmentStopMonitoringBinding
 import com.wen.android.mtabuscomparison.feature.favorite.FavoriteStop
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.BusDatabase
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.Stop
@@ -61,7 +61,7 @@ class StopMonitoringFragment : Fragment(),
 
     private val mViewModel: StopMonitoringViewModel by viewModels()
 
-    private lateinit var binding: ActivityStopMonitoringBinding
+    private lateinit var binding: FragmentStopMonitoringBinding
 //    by viewBindingLazy()
 
     private val args: StopMonitoringFragmentArgs by navArgs()
@@ -84,7 +84,7 @@ class StopMonitoringFragment : Fragment(),
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        binding = ActivityStopMonitoringBinding.inflate(layoutInflater, container, false)
+        binding = FragmentStopMonitoringBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
 

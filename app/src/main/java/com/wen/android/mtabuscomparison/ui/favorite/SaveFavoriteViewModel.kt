@@ -3,7 +3,7 @@ package com.wen.android.mtabuscomparison.ui.favorite
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.wen.android.mtabuscomparison.BusApplication
+import com.wen.android.mtabuscomparison.BaseApp
 import com.wen.android.mtabuscomparison.feature.favorite.FavoriteStop
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.BusDatabase
 import java.util.*
@@ -29,7 +29,7 @@ class SaveFavoriteViewModel: ViewModel() {
     val isSaved: LiveData<Boolean> = _saved
 
     fun onSaveFavorite() {
-        BusDatabase.getInstance(BusApplication.instance).favoriteStopDao().insert(
+        BusDatabase.getInstance(BaseApp.instance).favoriteStopDao().insert(
             FavoriteStop(
                 _stopId.value!!,
                 null,

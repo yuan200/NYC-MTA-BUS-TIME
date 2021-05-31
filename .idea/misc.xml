@@ -29,7 +29,8 @@
         <entry key="app/src/main/res/layout/fragment_favorite.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_favorite2.xml" value="0.335" />
         <entry key="app/src/main/res/layout/fragment_save_favorite.xml" value="0.17291666666666666" />
-        <entry key="app/src/main/res/layout/fragment_stop_map.xml" value="0.17831813576494426" />
+        <entry key="app/src/main/res/layout/fragment_stop_map.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_stop_monitoring.xml" value="0.17831813576494426" />
         <entry key="app/src/main/res/layout/list_item_bus.xml" value="0.1287037037037037" />
         <entry key="app/src/main/res/layout/list_route_bus.xml" value="0.36666666666666664" />
         <entry key="app/src/main/res/layout/search_list_item.xml" value="0.20989583333333334" />

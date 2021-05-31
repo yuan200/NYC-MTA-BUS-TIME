@@ -97,7 +97,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="150dp"
                 app:layout_anchor="@id/stop_monitoring_recycler_view"
-                app:layout_anchorGravity="top" />
+                app:layout_anchorGravity="top"
+                tools:listitem='@layout/stop_monitoring_bus_code_item'/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/stop_monitoring_bus_code_rv"
