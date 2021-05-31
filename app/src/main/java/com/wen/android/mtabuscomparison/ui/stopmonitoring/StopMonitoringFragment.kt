@@ -1,6 +1,7 @@
 package com.wen.android.mtabuscomparison.ui.stopmonitoring
 
 import android.content.res.Configuration
+import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -84,7 +85,11 @@ class StopMonitoringFragment : Fragment(),
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        binding = FragmentStopMonitoringBinding.inflate(layoutInflater, container, false)
+        binding = FragmentStopMonitoringBinding.inflate(layoutInflater, container, false).apply {
+            stopMonitoringRecyclerView.apply {
+                addItemDecoration(TopCornerItemDecoration())
+            }
+        }
         return binding.root
     }
 
@@ -105,10 +110,12 @@ class StopMonitoringFragment : Fragment(),
                         Timber.v("stopMonitoringData received success")
                         onStopMonitoringFetched(it.data)
                         binding.stopMonitoringProgressBar.hide()
+                        binding.stopMonitoringProgressBar.visibility = View.GONE
                     }
                     is Result.Failure -> {
                         Timber.v("stopMonitoringData received failure")
                         binding.stopMonitoringProgressBar.hide()
+                        binding.stopMonitoringProgressBar.visibility = View.GONE
 
                     }
                 }
@@ -185,7 +192,8 @@ class StopMonitoringFragment : Fragment(),
                         }
                         setMapPaddingBottom(slideOffset, maxPadding)
                     }
-                    else -> {}
+                    else -> {
+                    }
                 }
             }
 
@@ -435,6 +443,19 @@ class StopMonitoringFragment : Fragment(),
                 ContextCompat.getDrawable(requireContext(), R.drawable.ic_favorite_pink_24dp)
             else -> mFavoriteButton.background =
                 ContextCompat.getDrawable(requireContext(), R.drawable.ic_favorite_border_pink_24dp)
+        }
+    }
+}
+
+class TopCornerItemDecoration : RecyclerView.ItemDecoration() {
+    override fun getItemOffsets(
+        outRect: Rect,
+        view: View,
+        parent: RecyclerView,
+        state: RecyclerView.State
+    ) {
+        if (parent.getChildAdapterPosition(view) == 0) {
+            view.background = ContextCompat.getDrawable(view.context, R.drawable.recycler_item_corner)
         }
     }
 }

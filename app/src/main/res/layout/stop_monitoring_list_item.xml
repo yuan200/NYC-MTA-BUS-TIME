@@ -5,9 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?colorOnPrimary"
-    android:layout_marginHorizontal="@dimen/grid_1_5"
     android:layout_marginBottom="4dp"
-    android:elevation="4dp"
     android:theme="@style/StopMonitoringCardTheme">
 
     <View
@@ -24,7 +22,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:textColor="@color/primaryTextColor"
         android:textAppearance="?textAppearanceHeadline4"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -32,10 +29,9 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/stop_monitoring_line_img"
-        android:layout_width="18dp"
-        android:layout_height="18dp"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="4dp"
         android:rotation="90"
         app:layout_constraintEnd_toStartOf="@+id/destination_name"
         app:layout_constraintHorizontal_bias="0"
@@ -50,8 +46,8 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:maxLines="2"
-        android:textAppearance="?textAppearanceBody1"
-        android:textColor="@color/material_on_background_emphasis_medium"
+        android:textColor="@color/primaryTextColor"
+        android:textAppearance="?attr/textAppearanceSubtitle1"
         app:layout_constrainedWidth="true"
         app:layout_constraintStart_toEndOf="@+id/stop_monitoring_line_img"
         app:layout_constraintTop_toBottomOf="@+id/published_line"
@@ -61,8 +57,7 @@
         android:id="@+id/expected_arrive_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?textAppearanceBody1"
-        android:textColor="@color/material_on_background_emphasis_medium"
+        android:textAppearance="?textAppearanceSubtitle1"
         android:layout_marginStart="16dp"
         app:layout_constrainedWidth="true"
         app:layout_constraintStart_toStartOf="parent"
@@ -76,8 +71,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="@dimen/grid_0_5"
-        android:textAppearance="?textAppearanceBody1"
-        android:textColor="@color/material_on_background_emphasis_medium"
+        android:textAppearance="?textAppearanceSubtitle1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/barrier"
         tools:text=" 1 stop away" />
@@ -89,7 +83,6 @@
         android:layout_marginStart="16dp"
         android:layout_marginBottom="@dimen/grid_0_5"
         android:textAppearance="?textAppearanceBody1"
-        android:textColor="@color/material_on_background_emphasis_medium"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/presentable_distance"
         tools:text="arrival proximity ?" />
@@ -101,7 +94,6 @@
         android:layout_marginStart="16dp"
         android:layout_marginBottom="@dimen/grid_0_5"
         android:textAppearance="?textAppearanceBody1"
-        android:textColor="@color/material_on_background_emphasis_medium"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/arrival_proximity"
         tools:text="Next at 10: 20 11:23" />

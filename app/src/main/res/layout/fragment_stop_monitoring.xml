@@ -113,10 +113,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:background="?colorSurface"
+                android:background="@drawable/corner"
+                android:elevation="16dp"
                 app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
                 app:behavior_hideable="false"
-                app:behavior_peekHeight="150dp"
+                app:behavior_peekHeight="155dp"
                 app:layout_insetEdge="bottom" >
 
                 <com.google.android.material.progressindicator.LinearProgressIndicator
@@ -124,6 +125,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="10dp"
                     android:indeterminate="true"
+                    android:visibility="gone"
                     android:contentDescription="@string/progress_bar"/>
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/stop_monitoring_recycler_view"
