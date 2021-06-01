@@ -63,7 +63,7 @@ class StopMapViewMvcImpl(
     init {
         setRootView(inflater.inflate(R.layout.fragment_stop_map, parent, false))
 
-        supportMapFragment = (fragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment)
+        supportMapFragment = (fragmentManager.findFragmentById(R.id.stop_map_map_view) as SupportMapFragment)
 
         supportMapFragment?.getMapAsync {
             mGoogleMap = it
@@ -103,7 +103,7 @@ class StopMapViewMvcImpl(
 
         mSearchView = findViewById(R.id.search_et)
 
-        mSearchIcon = findViewById<AppCompatImageView>(R.id.search_icon).apply {
+        mSearchIcon = findViewById<AppCompatImageView>(R.id.stop_map_search_icon).apply {
             setOnClickListener {
                 mSearchListener.onStartSearch()
             }
@@ -155,7 +155,7 @@ class StopMapViewMvcImpl(
     }
 
     override fun bindStopInfo(data: List<StopInfo>) {
-        mAdapter = StopsRecyclerAdapter(data, this, this)
+//        mAdapter = StopsRecyclerAdapter(data, this, this)
         mCurrentFocusStop = 0
         mRecyclerView.adapter = mAdapter
     }
@@ -243,7 +243,7 @@ class StopMapViewMvcImpl(
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             mGoogleMap.isMyLocationEnabled = true
-            (fragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment).requireView().findViewById<View>(
+            (fragmentManager.findFragmentById(R.id.stop_map_map_view) as SupportMapFragment).requireView().findViewById<View>(
                 0x2
             ).apply {
                 val params = layoutParams as RelativeLayout.LayoutParams

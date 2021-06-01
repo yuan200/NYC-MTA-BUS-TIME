@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityOptions
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.os.Parcelable
@@ -12,18 +13,26 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.*
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.wen.android.mtabuscomparison.R
 import com.wen.android.mtabuscomparison.common.permission.MyPermission
 import com.wen.android.mtabuscomparison.common.permission.PermissionHelper
 import com.wen.android.mtabuscomparison.common.permission.PermissionHelper.PermissionsResult
+import com.wen.android.mtabuscomparison.databinding.FragmentStopMapBinding
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.BusDatabase.Companion.getInstance
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopInfo
 import com.wen.android.mtabuscomparison.ui.routesview.RoutesViewActivity
@@ -31,20 +40,38 @@ import com.wen.android.mtabuscomparison.ui.search.SearchActivity
 import com.wen.android.mtabuscomparison.ui.stopmap.StopMapViewMvc.*
 import com.wen.android.mtabuscomparison.ui.stopmonitoring.StopMonitoringActivity
 import com.wen.android.mtabuscomparison.util.SearchHandler
+import com.wen.android.mtabuscomparison.util.bitmapDescriptorFromVector
+import com.wen.android.mtabuscomparison.util.dpToPx
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.*
-import java.util.concurrent.Executors
 import kotlin.collections.ArrayList
 
 /**
  * Created by yuan on 4/10/2017.
  */
+@AndroidEntryPoint
 class StopMapFragment : Fragment(), OnMovedMapListener, Listener, OnStartSearchListener, MapListener,
-    PermissionHelper.Listener {
-    private val PERMISSION_ACCESS_FINE_LOCATION = 1
+    PermissionHelper.Listener, StopsRecyclerAdapter.Listener {
     private var fusedLocationClient: FusedLocationProviderClient? = null
     private var mPermissionHelper: PermissionHelper? = null
-    private lateinit var mStopMapView: StopMapViewMvc
+    private var mCurrentFocusStop = 0
+    private var previousFocusStop = Integer.MAX_VALUE
+    private lateinit var mGoogleMap: GoogleMap
+    private lateinit var mAdapter: StopsRecyclerAdapter
+    private val mStopMarkList = mutableListOf<Marker>()
+    private var mPreviousCameraLocation = Location("").apply {
+        this.latitude = 0.0
+        this.longitude = 0.0
+    }
+    private val noUpdateDistance = 200
+
+    private var _binding: FragmentStopMapBinding? = null
+
+    private val binding get() = _binding!!
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mPermissionHelper = PermissionHelper(requireActivity())
@@ -58,45 +85,86 @@ class StopMapFragment : Fragment(), OnMovedMapListener, Listener, OnStartSearchL
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        mStopMapView = StopMapViewMvcImpl(inflater, container!!, childFragmentManager, this, this)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragmentStopMapBinding.inflate(inflater, container, false)
         setHasOptionsMenu(true)
-        mStopMapView.getSearchBar().setOnEditorActionListener { v: TextView, actionId: Int, event: KeyEvent? ->
+        binding.stopMapMapView.onCreate(savedInstanceState)
+        binding.stopMapMapView.getMapAsync {
+            mGoogleMap = it
+            mGoogleMap.uiSettings.isMapToolbarEnabled = false
+            mGoogleMap.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(
+                    requireContext(),
+                    R.raw.google_map_no_bus_stop_style
+                )
+            )
+
+            enableMyLocationButton()
+
+            onMapReady()
+
+            mGoogleMap.setOnCameraIdleListener {
+                val currentCameraLocation = Location("").apply {
+                    this.latitude = it.cameraPosition.target.latitude
+                    this.longitude = it.cameraPosition.target.longitude
+                }
+                if (mPreviousCameraLocation.distanceTo(currentCameraLocation) > noUpdateDistance) {
+                    onMovedMap(it.cameraPosition.target)
+                }
+                mPreviousCameraLocation = currentCameraLocation
+            }
+        }
+        binding.apply {
+            nearbyRecycleView.layoutManager = LinearLayoutManager(context)
+            searchView.apply {
+                doOnLayout {
+                    it.translationX = it.width - (40.dpToPx).toFloat()
+                }
+            }
+            stopMapSearchIcon.setOnClickListener { onStartSearch() }
+        }
+
+        binding.searchEt.setOnEditorActionListener { v: TextView, actionId: Int, event: KeyEvent? ->
             displaySearchResult(v.text.toString())
             true
         }
-        return mStopMapView.getRootView()
+        return binding.root
     }
 
     override fun onResume() {
         Timber.i("onResume")
         super.onResume()
+        binding.stopMapMapView.onResume()
     }
 
     override fun onStart() {
         Timber.i("onStart")
         super.onStart()
-        mStopMapView!!.registerMapListener(this)
-        mStopMapView!!.registerListener(this)
+        binding.stopMapMapView.onStart()
         mPermissionHelper!!.registerListener(this)
     }
 
     override fun onPause() {
         Timber.i("onPause")
         super.onPause()
+        binding.stopMapMapView.onPause()
     }
 
     override fun onStop() {
         Timber.i("onStop")
         super.onStop()
-        mStopMapView!!.unregisterMapListener(this)
-        mStopMapView!!.unregisterListener(this)
+        binding.stopMapMapView.onStop()
         mPermissionHelper!!.unregisterListener(this)
     }
 
     override fun onDestroyView() {
         Timber.v("onDestroyView()")
-        mStopMapView!!.onDestroyView()
+        mStopMarkList.clear()
+//        mGoogleMap.clear()
+        binding.nearbyRecycleView.adapter = null
+        binding.stopMapMapView.onDestroy()
+        binding.stopMapMapView.removeAllViews()
+        _binding = null
         super.onDestroyView()
     }
 
@@ -105,13 +173,107 @@ class StopMapFragment : Fragment(), OnMovedMapListener, Listener, OnStartSearchL
         super.onDestroy()
     }
 
+    override fun onLowMemory() {
+        super.onLowMemory()
+        binding.stopMapMapView.onLowMemory()
+    }
+    fun bindStopInfo(data: List<StopInfo>) {
+        mAdapter = StopsRecyclerAdapter(data, this, this)
+        mCurrentFocusStop = 0
+        binding.nearbyRecycleView.adapter = mAdapter
+    }
+
+    fun scrollToStop(index: Int) {
+        binding.nearbyRecycleView.layoutManager!!.scrollToPosition(index)
+        binding.nearbyRecycleView.adapter!!.notifyItemChanged(previousFocusStop)
+        binding.nearbyRecycleView.adapter!!.notifyItemChanged(index)
+    }
+
+    fun addCurrentLocationMarker(location: Location) {
+        val here = LatLng(location.latitude, location.longitude)
+        mGoogleMap.clear()
+        mGoogleMap.addMarker(
+            MarkerOptions().position(here).title("You are here")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person_pin_circle_black_36dp))
+        )
+        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(here, 16f)
+        val cameraPosition = CameraPosition.builder()
+            .target(here)
+            .zoom(16f)
+            .build()
+        mGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+    }
+
+    fun removeMarkers() {
+        mStopMarkList.clear()
+        mGoogleMap.clear()
+    }
+
+    fun addStopMarker(st: StopInfo) {
+        val nearbyStopLatLng = LatLng(st.location.latitude, st.location.longitude)
+        mStopMarkList.add(
+            mGoogleMap.addMarker(
+                MarkerOptions()
+                    .position(nearbyStopLatLng)
+                    .icon(bitmapDescriptorFromVector(requireContext(), R.drawable.ic_bus_blue_20dp))
+                    .title(st.intersections)
+            )
+        )
+        if (mStopMarkList.size == 1) mStopMarkList[0].showInfoWindow()
+        mGoogleMap.setOnMarkerClickListener { marker ->
+            val stopList = mAdapter.mStops
+            for (position in stopList.indices) {
+                val lat = marker.position.latitude.compareTo(stopList[position].location.latitude)
+                val lon = marker.position.longitude.compareTo(stopList[position].location.longitude)
+                if (lat == 0 && lon == 0) {
+                    previousFocusStop = mCurrentFocusStop
+                    mCurrentFocusStop = position
+                    scrollToStop(position)
+                }
+            }
+            false
+        }
+    }
+
+    fun moveCameraTo(latLng: LatLng) {
+        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng))
+    }
+
+    fun getFocusStop() = mCurrentFocusStop
+
+    @SuppressLint("ResourceType")
+    fun enableMyLocationButton() {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            mGoogleMap.isMyLocationEnabled = true
+            binding.stopMapMapView.findViewById<View>(
+                0x2
+            ).apply {
+                val params = layoutParams as RelativeLayout.LayoutParams
+                params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+                params.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
+                params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 0)
+                params.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0)
+                params.bottomMargin = 50.dpToPx
+                params.rightMargin = 0.dpToPx
+                layoutParams = params
+            }
+        }
+    }
+
     /**
      * start a new activity and display the search result
      */
     fun displaySearchResult(userInput: String) {
         val bundle = Bundle()
         bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM, userInput)
-        FirebaseAnalytics.getInstance(context).logEvent(FirebaseAnalytics.Event.SEARCH, bundle)
+        FirebaseAnalytics.getInstance(requireContext()).logEvent(FirebaseAnalytics.Event.SEARCH, bundle)
         val searchHandler = SearchHandler(userInput)
         if (searchHandler.keywordType() == 0) {
             val stopcodeArray = arrayOfNulls<String>(1)
@@ -155,7 +317,7 @@ class StopMapFragment : Fragment(), OnMovedMapListener, Listener, OnStartSearchL
         new_latitude2 = current_latitude + coef_plus
         new_longitude1 = current_longitude + coef_plus / Math.cos(current_latitude * 0.018)
         new_longitude2 = current_longitude + coef_neg / Math.cos(current_latitude * 0.018)
-        Executors.newSingleThreadExecutor().execute {
+        viewLifecycleOwner.lifecycleScope.launchWhenCreated{
             val bustList =
                 getInstance(
                     requireContext()
@@ -174,20 +336,18 @@ class StopMapFragment : Fragment(), OnMovedMapListener, Listener, OnStartSearchL
                 stopList.add(stop)
                 stopList.sort()
             }
-            if (activity != null) {
-                requireActivity().runOnUiThread {
-                    mStopMapView.removeMarkers()
+                withContext(Dispatchers.Main){
+                    removeMarkers()
                     for (st in stopList) {
-                        mStopMapView.addStopMarker(st)
+                        addStopMarker(st)
                     }
                     updateNearbyStopList(stopList)
                 }
-            }
         }
     }
 
     private fun updateNearbyStopList(nearbyStopList: List<StopInfo>) {
-        mStopMapView.bindStopInfo(nearbyStopList)
+        bindStopInfo(nearbyStopList)
     }
 
     override fun onMovedMap(latLng: LatLng) {
@@ -224,7 +384,7 @@ class StopMapFragment : Fragment(), OnMovedMapListener, Listener, OnStartSearchL
                     )
                 } else {
                     val latlng = data.getParcelableExtra<Parcelable>(getString(R.string.SEARCH_RESULT_POINT)) as LatLng
-                    mStopMapView.moveCameraTo(latlng)
+                    moveCameraTo(latlng)
                 }
             }
         } else {
@@ -240,8 +400,8 @@ class StopMapFragment : Fragment(), OnMovedMapListener, Listener, OnStartSearchL
             }
             fusedLocationClient!!.lastLocation.addOnSuccessListener { location: Location? ->
                 Timber.i("last known location: $location")
-                mStopMapView.addCurrentLocationMarker(location.orDummy)
-                findNearByStop(location.orDummy)
+                addCurrentLocationMarker(location.orDummy)
+//                findNearByStop(location.orDummy)
             }
         }
     }
@@ -258,9 +418,9 @@ class StopMapFragment : Fragment(), OnMovedMapListener, Listener, OnStartSearchL
                 fusedLocationClient!!.lastLocation.addOnSuccessListener { location: Location? ->
                     if (location != null) {
                         //todo what would happen if location is null, does it break other things?
-                        mStopMapView.enableMyLocationButton()
-                        findNearByStop(location)
-                        mStopMapView.addCurrentLocationMarker(location)
+                        enableMyLocationButton()
+//                        findNearByStop(location)
+                        addCurrentLocationMarker(location)
                     }
                 }
             } else {
@@ -274,5 +434,6 @@ class StopMapFragment : Fragment(), OnMovedMapListener, Listener, OnStartSearchL
 
     companion object {
         const val SEARCH_ACTIVITY_REQUEST_CODE = 199
+        private const val PERMISSION_ACCESS_FINE_LOCATION = 1
     }
 }
