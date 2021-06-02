@@ -6,6 +6,8 @@ import com.wen.android.mtabuscomparison.feature.stopmonitoring.BusDatabase
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.BusStopDao
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.storage.repo.DefaultStopMonitoringRepository
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.storage.repo.StopMonitoringRepository
+import com.wen.android.mtabuscomparison.ui.stopmap.DefaultNearByRepository
+import com.wen.android.mtabuscomparison.ui.stopmap.NearByRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -48,9 +50,20 @@ class ApplicationModule {
 
     @Provides
     @Singleton
+    fun provideNearByStopRepository(dataSource: DefaultNearByRepository): NearByRepository =
+        dataSource
+
+    @Provides
+    @Singleton
     fun provideStopDB(@ApplicationContext context: Context): BusStopDao {
         return BusDatabase
             .getInstance(context)
             .busStopDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideBusDatabase(@ApplicationContext context: Context): BusDatabase {
+        return BusDatabase.getInstance(context)
     }
 }

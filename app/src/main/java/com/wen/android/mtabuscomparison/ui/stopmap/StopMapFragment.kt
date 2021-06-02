@@ -19,7 +19,8 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -33,7 +34,6 @@ import com.wen.android.mtabuscomparison.common.permission.MyPermission
 import com.wen.android.mtabuscomparison.common.permission.PermissionHelper
 import com.wen.android.mtabuscomparison.common.permission.PermissionHelper.PermissionsResult
 import com.wen.android.mtabuscomparison.databinding.FragmentStopMapBinding
-import com.wen.android.mtabuscomparison.feature.stopmonitoring.BusDatabase.Companion.getInstance
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopInfo
 import com.wen.android.mtabuscomparison.ui.routesview.RoutesViewActivity
 import com.wen.android.mtabuscomparison.ui.search.SearchActivity
@@ -42,12 +42,13 @@ import com.wen.android.mtabuscomparison.ui.stopmonitoring.StopMonitoringActivity
 import com.wen.android.mtabuscomparison.util.SearchHandler
 import com.wen.android.mtabuscomparison.util.bitmapDescriptorFromVector
 import com.wen.android.mtabuscomparison.util.dpToPx
+import com.wen.android.mtabuscomparison.util.fragment.repeatOnViewLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * Created by yuan on 4/10/2017.
@@ -67,6 +68,8 @@ class StopMapFragment : Fragment(), OnMovedMapListener, Listener, OnStartSearchL
         this.longitude = 0.0
     }
     private val noUpdateDistance = 200
+
+    private val viewModel: StopMapViewModel by viewModels()
 
     private var _binding: FragmentStopMapBinding? = null
 
@@ -131,6 +134,25 @@ class StopMapFragment : Fragment(), OnMovedMapListener, Listener, OnStartSearchL
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        repeatOnViewLifecycle(Lifecycle.State.STARTED) {
+            viewModel.nearByStop.collect {
+                withContext(Dispatchers.Main) {
+                    if (mStopMarkList.isNotEmpty()) {
+                        removeMarkers()
+                    }
+                    for (st in it) {
+                        addStopMarker(st)
+                    }
+                    updateNearbyStopList(it)
+                }
+
+            }
+        }
+    }
+
     override fun onResume() {
         Timber.i("onResume")
         super.onResume()
@@ -177,26 +199,23 @@ class StopMapFragment : Fragment(), OnMovedMapListener, Listener, OnStartSearchL
         super.onLowMemory()
         binding.stopMapMapView.onLowMemory()
     }
-    fun bindStopInfo(data: List<StopInfo>) {
+
+    private fun bindStopInfo(data: List<StopInfo>) {
         mAdapter = StopsRecyclerAdapter(data, this, this)
         mCurrentFocusStop = 0
         binding.nearbyRecycleView.adapter = mAdapter
     }
 
-    fun scrollToStop(index: Int) {
+    private fun scrollToStop(index: Int) {
         binding.nearbyRecycleView.layoutManager!!.scrollToPosition(index)
         binding.nearbyRecycleView.adapter!!.notifyItemChanged(previousFocusStop)
         binding.nearbyRecycleView.adapter!!.notifyItemChanged(index)
     }
 
-    fun addCurrentLocationMarker(location: Location) {
+    private fun addCurrentLocationMarker(location: Location) {
         val here = LatLng(location.latitude, location.longitude)
         mGoogleMap.clear()
-        mGoogleMap.addMarker(
-            MarkerOptions().position(here).title("You are here")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person_pin_circle_black_36dp))
-        )
-        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(here, 16f)
+
         val cameraPosition = CameraPosition.builder()
             .target(here)
             .zoom(16f)
@@ -204,12 +223,12 @@ class StopMapFragment : Fragment(), OnMovedMapListener, Listener, OnStartSearchL
         mGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
     }
 
-    fun removeMarkers() {
+    private fun removeMarkers() {
         mStopMarkList.clear()
         mGoogleMap.clear()
     }
 
-    fun addStopMarker(st: StopInfo) {
+    private fun addStopMarker(st: StopInfo) {
         val nearbyStopLatLng = LatLng(st.location.latitude, st.location.longitude)
         mStopMarkList.add(
             mGoogleMap.addMarker(
@@ -235,7 +254,7 @@ class StopMapFragment : Fragment(), OnMovedMapListener, Listener, OnStartSearchL
         }
     }
 
-    fun moveCameraTo(latLng: LatLng) {
+    private fun moveCameraTo(latLng: LatLng) {
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng))
     }
 
@@ -270,7 +289,7 @@ class StopMapFragment : Fragment(), OnMovedMapListener, Listener, OnStartSearchL
     /**
      * start a new activity and display the search result
      */
-    fun displaySearchResult(userInput: String) {
+    private fun displaySearchResult(userInput: String) {
         val bundle = Bundle()
         bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM, userInput)
         FirebaseAnalytics.getInstance(requireContext()).logEvent(FirebaseAnalytics.Event.SEARCH, bundle)
@@ -297,55 +316,6 @@ class StopMapFragment : Fragment(), OnMovedMapListener, Listener, OnStartSearchL
         mPermissionHelper!!.onRequestPermissionResult(requestCode, permissions, grantResults)
     }
 
-    /**
-     * get the current location and then find nearby stop from database
-     */
-    private fun findNearByStop(location: Location) {
-        val stopList = ArrayList<StopInfo>()
-        //change radius_in_meters if we want to change the range of the nearby stop
-        val radius_in_meters = 800.0
-        val radius_neg = 0 - radius_in_meters
-        val coef_plus = radius_in_meters * 0.0000089
-        val coef_neg = radius_neg * 0.0000089
-        val new_latitude1: Double
-        val new_latitude2: Double
-        val new_longitude1: Double
-        val new_longitude2: Double
-        val current_latitude = location.latitude
-        val current_longitude = location.longitude
-        new_latitude1 = current_latitude + coef_neg
-        new_latitude2 = current_latitude + coef_plus
-        new_longitude1 = current_longitude + coef_plus / Math.cos(current_latitude * 0.018)
-        new_longitude2 = current_longitude + coef_neg / Math.cos(current_latitude * 0.018)
-        viewLifecycleOwner.lifecycleScope.launchWhenCreated{
-            val bustList =
-                getInstance(
-                    requireContext()
-                ).busStopDao().getStopsInRange(new_latitude1, new_latitude2, new_longitude2, new_longitude1)
-            for ((stopId, stopName, stopLat, stopLon, routeId) in bustList) {
-                val stop = StopInfo()
-                val tempLocation = Location("tempLocation")
-                tempLocation.latitude = stopLat
-                tempLocation.longitude = stopLon
-                val distance = location.distanceTo(tempLocation)
-                stop.stopCode = stopId
-                stop.intersections = stopName
-                stop.routes = routeId
-                stop.location = tempLocation
-                stop.distance = distance
-                stopList.add(stop)
-                stopList.sort()
-            }
-                withContext(Dispatchers.Main){
-                    removeMarkers()
-                    for (st in stopList) {
-                        addStopMarker(st)
-                    }
-                    updateNearbyStopList(stopList)
-                }
-        }
-    }
-
     private fun updateNearbyStopList(nearbyStopList: List<StopInfo>) {
         bindStopInfo(nearbyStopList)
     }
@@ -354,7 +324,8 @@ class StopMapFragment : Fragment(), OnMovedMapListener, Listener, OnStartSearchL
         val location = Location("")
         location.latitude = latLng.latitude
         location.longitude = latLng.longitude
-        findNearByStop(location)
+//        findNearByStop(location)
+        viewModel.loadNearByStop(location)
     }
 
     override fun onStopClicked(stop: StopInfo) {
