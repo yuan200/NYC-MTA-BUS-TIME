@@ -9,37 +9,27 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.os.Parcelable
-import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.*
-import com.google.firebase.analytics.FirebaseAnalytics
 import com.wen.android.mtabuscomparison.R
 import com.wen.android.mtabuscomparison.common.permission.MyPermission
 import com.wen.android.mtabuscomparison.common.permission.PermissionHelper
 import com.wen.android.mtabuscomparison.common.permission.PermissionHelper.PermissionsResult
 import com.wen.android.mtabuscomparison.databinding.FragmentStopMapBinding
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopInfo
-import com.wen.android.mtabuscomparison.ui.routesview.RoutesViewActivity
 import com.wen.android.mtabuscomparison.ui.search.SearchActivity
-import com.wen.android.mtabuscomparison.ui.stopmap.StopMapViewMvc.*
-import com.wen.android.mtabuscomparison.ui.stopmonitoring.StopMonitoringActivity
-import com.wen.android.mtabuscomparison.util.SearchHandler
 import com.wen.android.mtabuscomparison.util.bitmapDescriptorFromVector
 import com.wen.android.mtabuscomparison.util.dpToPx
 import com.wen.android.mtabuscomparison.util.fragment.repeatOnViewLifecycle
@@ -48,15 +38,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.*
 
 /**
  * Created by yuan on 4/10/2017.
  */
 @AndroidEntryPoint
-class StopMapFragment : Fragment(), OnMovedMapListener, Listener, OnStartSearchListener, MapListener,
-    PermissionHelper.Listener, StopsRecyclerAdapter.Listener {
-    private var fusedLocationClient: FusedLocationProviderClient? = null
+class StopMapFragment :
+    Fragment(),
+    PermissionHelper.Listener,
+    StopsRecyclerAdapter.Listener {
     private var mPermissionHelper: PermissionHelper? = null
     private var mCurrentFocusStop = 0
     private var previousFocusStop = Integer.MAX_VALUE
@@ -83,8 +73,6 @@ class StopMapFragment : Fragment(), OnMovedMapListener, Listener, OnStartSearchL
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                 PERMISSION_ACCESS_FINE_LOCATION
             )
-        } else {
-            fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
         }
     }
 
@@ -127,17 +115,13 @@ class StopMapFragment : Fragment(), OnMovedMapListener, Listener, OnStartSearchL
             stopMapSearchIcon.setOnClickListener { onStartSearch() }
         }
 
-        binding.searchEt.setOnEditorActionListener { v: TextView, actionId: Int, event: KeyEvent? ->
-            displaySearchResult(v.text.toString())
-            true
-        }
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        repeatOnViewLifecycle(Lifecycle.State.STARTED) {
+        repeatOnViewLifecycle {
             viewModel.nearByStop.collect {
                 withContext(Dispatchers.Main) {
                     if (mStopMarkList.isNotEmpty()) {
@@ -286,32 +270,6 @@ class StopMapFragment : Fragment(), OnMovedMapListener, Listener, OnStartSearchL
         }
     }
 
-    /**
-     * start a new activity and display the search result
-     */
-    private fun displaySearchResult(userInput: String) {
-        val bundle = Bundle()
-        bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM, userInput)
-        FirebaseAnalytics.getInstance(requireContext()).logEvent(FirebaseAnalytics.Event.SEARCH, bundle)
-        val searchHandler = SearchHandler(userInput)
-        if (searchHandler.keywordType() == 0) {
-            val stopcodeArray = arrayOfNulls<String>(1)
-            //get the bus code from the user input
-            stopcodeArray[0] = userInput
-            if (stopcodeArray[0] == null) {
-                return
-            }
-            val intent = Intent(activity, StopMonitoringActivity::class.java)
-            intent.putExtra(Intent.EXTRA_TEXT, stopcodeArray)
-            startActivity(intent)
-        } else {
-            val routeEntered = userInput.toUpperCase(Locale.US)
-            val intent = Intent(activity, RoutesViewActivity::class.java)
-            intent.putExtra(Intent.EXTRA_TEXT, routeEntered)
-            startActivity(intent)
-        }
-    }
-
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         mPermissionHelper!!.onRequestPermissionResult(requestCode, permissions, grantResults)
     }
@@ -320,7 +278,7 @@ class StopMapFragment : Fragment(), OnMovedMapListener, Listener, OnStartSearchL
         bindStopInfo(nearbyStopList)
     }
 
-    override fun onMovedMap(latLng: LatLng) {
+    private fun onMovedMap(latLng: LatLng) {
         val location = Location("")
         location.latitude = latLng.latitude
         location.longitude = latLng.longitude
@@ -335,7 +293,7 @@ class StopMapFragment : Fragment(), OnMovedMapListener, Listener, OnStartSearchL
         )
     }
 
-    override fun onStartSearch() {
+    private fun onStartSearch() {
         startActivityForResult(
             Intent(context, SearchActivity::class.java),
             SEARCH_ACTIVITY_REQUEST_CODE,
@@ -364,15 +322,13 @@ class StopMapFragment : Fragment(), OnMovedMapListener, Listener, OnStartSearchL
     }
 
     @SuppressLint("MissingPermission")
-    override fun onMapReady() {
+    private fun onMapReady() {
         if (mPermissionHelper!!.hasPermission(MyPermission.FINE_LOCATION)) {
-            if (fusedLocationClient == null) {
-                fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
-            }
-            fusedLocationClient!!.lastLocation.addOnSuccessListener { location: Location? ->
-                Timber.i("last known location: $location")
-                addCurrentLocationMarker(location.orDummy)
-//                findNearByStop(location.orDummy)
+
+            repeatOnViewLifecycle {
+                viewModel.myLocation.collect {
+                    addCurrentLocationMarker(it)
+                }
             }
         }
     }
@@ -385,15 +341,14 @@ class StopMapFragment : Fragment(), OnMovedMapListener, Listener, OnStartSearchL
                 )
             ) {
                 Timber.i("permission granted")
-                fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
-                fusedLocationClient!!.lastLocation.addOnSuccessListener { location: Location? ->
-                    if (location != null) {
-                        //todo what would happen if location is null, does it break other things?
+                repeatOnViewLifecycle {
+                    viewModel.myLocation.collect {
                         enableMyLocationButton()
 //                        findNearByStop(location)
-                        addCurrentLocationMarker(location)
+                        addCurrentLocationMarker(it)
                     }
                 }
+
             } else {
                 Toast.makeText(context, "Need Location permission", Toast.LENGTH_LONG)
                     .show()

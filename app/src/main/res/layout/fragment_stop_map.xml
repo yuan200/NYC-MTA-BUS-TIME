@@ -47,16 +47,6 @@
                     android:layout_height="40dp"
                     app:srcCompat="@drawable/places_ic_search"/>
 
-                <EditText
-                    android:id="@+id/search_et"
-                    android:layout_width="fill_parent"
-                    android:layout_height="40dp"
-                    android:layout_toStartOf="@+id/search_hide_btn"
-                    android:layout_toEndOf="@+id/stop_map_search_icon"
-                    android:hint="@string/enter_route_number_or_stop_number"
-                    android:imeOptions="actionSearch"
-                    android:inputType="text"
-                    tools:ignore="Autofill" />
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/search_hide_btn"
                     android:layout_width="40dp"

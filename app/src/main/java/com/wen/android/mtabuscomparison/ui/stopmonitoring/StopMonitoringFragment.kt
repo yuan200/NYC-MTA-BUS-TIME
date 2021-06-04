@@ -13,7 +13,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -98,7 +97,7 @@ class StopMonitoringFragment : Fragment(),
 
         Timber.i("onViewCreated")
 
-        repeatOnViewLifecycle(STARTED) {
+        repeatOnViewLifecycle {
             mViewModel.stopStopMonitoringData.collect {
                 when (it) {
                     Result.Loading -> {
@@ -147,7 +146,7 @@ class StopMonitoringFragment : Fragment(),
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         }
 
-        repeatOnViewLifecycle(STARTED) {
+        repeatOnViewLifecycle {
             mViewModel.publishedLineAdapterData.collect {
                 if (it.size > 0) {
                     binding.stopMonitoringBusCodeRv.adapter = BusCodeAdapter(it) { busCode ->
@@ -212,7 +211,7 @@ class StopMonitoringFragment : Fragment(),
             )
 
             Timber.i("google map is ready")
-            repeatOnViewLifecycle(STARTED) {
+            repeatOnViewLifecycle {
                 mViewModel.stop.collect {
                     mStop = it
                     setTitle(mStop?.stopName.orEmpty())
@@ -243,7 +242,7 @@ class StopMonitoringFragment : Fragment(),
             }
 
 
-            repeatOnViewLifecycle(STARTED) {
+            repeatOnViewLifecycle {
                 mViewModel.targetVehicleLocation.collect {
                     clearOldBusMarker()
                     if (it != null) {
@@ -265,7 +264,7 @@ class StopMonitoringFragment : Fragment(),
 
             }
 
-            repeatOnViewLifecycle(STARTED) {
+            repeatOnViewLifecycle {
                 mViewModel.vehicleAndStopBounds.collect {
                     mGoogleMap!!.moveCamera(
                         CameraUpdateFactory.newLatLngBounds(

@@ -4,16 +4,15 @@ import android.location.Location
 import androidx.lifecycle.viewModelScope
 import com.wen.android.mtabuscomparison.common.Result
 import com.wen.android.mtabuscomparison.feature.stopmap.LoadNearByStopUseCase
+import com.wen.android.mtabuscomparison.feature.stopmap.LocationRepository
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopInfo
 import com.wen.android.mtabuscomparison.util.coroutine.DispatcherProvider
 import com.wen.android.mtabuscomparison.util.coroutine.cancelIfActive
 import com.wen.android.mtabuscomparison.util.viewmodel.BusViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.cos
@@ -22,10 +21,14 @@ import kotlin.math.cos
 class StopMapViewModel
 @Inject constructor(
     private val loadNearByStopUseCase: LoadNearByStopUseCase,
+    private val locationRepository: LocationRepository,
     dispatcherProvider: DispatcherProvider
 ) : BusViewModel(dispatcherProvider) {
 
     private var _location: Location? = null
+
+    val myLocation: SharedFlow<Location> =
+        locationRepository.locations.shareIn(viewModelScope, WhileSubscribed(5000), replay = 1)
 
     private var loadNearByStopJob: Job? = null
 
@@ -59,6 +62,7 @@ class StopMapViewModel
             }
         }
     }
+
 
     private fun getNearByRange(): NearByRange {
         val radiusInMeters = 800.0

@@ -6,9 +6,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.launch
 
-fun Fragment.repeatOnViewLifecycle(state: Lifecycle.State, block: suspend () -> Unit) {
+fun Fragment.repeatOnViewLifecycle(block: suspend () -> Unit) {
     viewLifecycleOwner.lifecycleScope.launch {
-        viewLifecycleOwner.lifecycle.repeatOnLifecycle(state) {
+        viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             block()
         }
     }

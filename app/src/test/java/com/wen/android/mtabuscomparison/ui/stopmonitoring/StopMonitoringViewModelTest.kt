@@ -17,9 +17,12 @@ import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.setMain
 import org.junit.Rule
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -50,6 +53,8 @@ internal class StopMonitoringViewModelTest {
     fun setUp() {
         MockKAnnotations.init(this)
 
+        Dispatchers.setMain(coroutineTestResult.testDispatcher)
+
         stop = Stop("400555", "E 32 ST/5 AV", 0.0, 0.0, "routeId")
 
         every { apiResult.busMonitoring } returns listOf(StopMonitoringListItem().apply {
@@ -71,6 +76,7 @@ internal class StopMonitoringViewModelTest {
 
     @AfterEach
     fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test
