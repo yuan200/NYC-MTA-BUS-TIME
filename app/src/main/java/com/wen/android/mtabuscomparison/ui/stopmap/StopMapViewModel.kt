@@ -2,6 +2,11 @@ package com.wen.android.mtabuscomparison.ui.stopmap
 
 import android.location.Location
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.maps.CameraUpdate
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.wen.android.mtabuscomparison.R
 import com.wen.android.mtabuscomparison.common.Result
 import com.wen.android.mtabuscomparison.feature.stopmap.LoadNearByStopUseCase
 import com.wen.android.mtabuscomparison.feature.stopmap.LocationRepository
@@ -63,6 +68,14 @@ class StopMapViewModel
         }
     }
 
+    val myLocationCameraUpdate: StateFlow<CameraUpdate?> = myLocation.mapLatest {
+        CameraUpdateFactory.newCameraPosition(
+            CameraPosition.builder()
+                .target(LatLng(it.latitude, it.longitude))
+                .zoom(16f)
+                .build()
+        )
+    }.stateIn(viewModelScope, WhileSubscribed(5000), null)
 
     private fun getNearByRange(): NearByRange {
         val radiusInMeters = 800.0
@@ -80,6 +93,10 @@ class StopMapViewModel
         newLongitude1 = currentLongitude + coefPlus / cos(currentLatitude * 0.018)
         newLongitude2 = currentLongitude + coefNeg / cos(currentLatitude * 0.018)
         return NearByRange(newLatitude1, newLatitude2, newLongitude2, newLongitude1)
+    }
+
+    fun getMapStyle(): Int {
+        return R.raw.google_map_no_bus_stop_style
     }
 
 }

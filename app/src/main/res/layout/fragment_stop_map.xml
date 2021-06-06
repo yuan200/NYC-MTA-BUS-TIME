@@ -1,64 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/fragment_container"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/stop_map_coordinatorLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="0dp">
+    xmlns:tools="http://schemas.android.com/tools">
 
-        <LinearLayout
+    <data>
+        <variable
+            name="viewModel"
+            type="com.wen.android.mtabuscomparison.ui.stopmap.StopMapViewModel" />
+    </data>
+
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/stop_map_coordinatorLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:padding="0dp">
 
-            <com.google.android.gms.maps.MapView
-                android:id="@+id/stop_map_map_view"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"/>
+                android:orientation="vertical">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/nearbyRecycleView"
+                <com.google.android.gms.maps.MapView
+                    android:id="@+id/stop_map_map_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    app:mapStyle="@{viewModel.mapStyle}"
+                    app:isMapToolbarEnabled="@{false}"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/nearbyRecycleView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layout_insetEdge="bottom"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/search_view"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layout_insetEdge= "bottom"
-                android:layout_weight="1"/>
+                android:layout_height="40dp"
+                android:translationY="-20dp"
+                android:layout_gravity="center_vertical">
 
-        </LinearLayout>
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp">
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/search_view"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:translationY="-20dp"
-            android:layout_gravity="center_vertical" >
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"  >
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/stop_map_search_icon"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    app:srcCompat="@drawable/places_ic_search"/>
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/stop_map_search_icon"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        app:srcCompat="@drawable/places_ic_search" />
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/search_hide_btn"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_alignParentEnd="true"
-                    android:clickable="true"
-                    android:focusable="true"
-                    app:srcCompat="@drawable/ic_arrow_right_alt_black_18dp"/>
-            </RelativeLayout>
-        </androidx.cardview.widget.CardView>
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/search_hide_btn"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_alignParentEnd="true"
+                        android:clickable="true"
+                        android:focusable="true"
+                        app:srcCompat="@drawable/ic_arrow_right_alt_black_18dp" />
+                </RelativeLayout>
+            </androidx.cardview.widget.CardView>
 
 
-
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
-</FrameLayout>
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </FrameLayout>
+</layout>

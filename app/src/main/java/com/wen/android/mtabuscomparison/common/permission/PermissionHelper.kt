@@ -5,10 +5,14 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.wen.android.mtabuscomparison.common.Observable
+import dagger.hilt.android.scopes.ActivityScoped
 import java.util.*
+import javax.inject.Inject
 
-
-class PermissionHelper(private val activity: Activity) : Observable<PermissionHelper.Listener> {
+@ActivityScoped
+class PermissionHelper
+@Inject constructor(private val activity: Activity) :
+    Observable<PermissionHelper.Listener> {
 
     interface Listener {
         fun onRequestPermissionsResult(requestCode: Int, result: PermissionsResult)

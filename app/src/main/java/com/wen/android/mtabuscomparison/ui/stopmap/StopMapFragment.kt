@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityOptions
+import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
@@ -16,13 +17,18 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.view.doOnLayout
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.maps.android.ktx.awaitMap
 import com.wen.android.mtabuscomparison.R
 import com.wen.android.mtabuscomparison.common.permission.MyPermission
 import com.wen.android.mtabuscomparison.common.permission.PermissionHelper
@@ -36,8 +42,10 @@ import com.wen.android.mtabuscomparison.util.fragment.repeatOnViewLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Created by yuan on 4/10/2017.
@@ -47,28 +55,43 @@ class StopMapFragment :
     Fragment(),
     PermissionHelper.Listener,
     StopsRecyclerAdapter.Listener {
-    private var mPermissionHelper: PermissionHelper? = null
-    private var mCurrentFocusStop = 0
+
+    @Inject
+    lateinit var permissionHelper: PermissionHelper
+
+    private var currentFocusStop = 0
     private var previousFocusStop = Integer.MAX_VALUE
-    private lateinit var mGoogleMap: GoogleMap
-    private lateinit var mAdapter: StopsRecyclerAdapter
-    private val mStopMarkList = mutableListOf<Marker>()
-    private var mPreviousCameraLocation = Location("").apply {
+
+    private lateinit var googleMap: GoogleMap
+    private val stopMarkerList = mutableListOf<Marker>()
+    private val noUpdateDistance = 200
+    private var previousCameraLocation = Location("").apply {
         this.latitude = 0.0
         this.longitude = 0.0
     }
-    private val noUpdateDistance = 200
+
+    private lateinit var stopAdapter: StopsRecyclerAdapter
 
     private val viewModel: StopMapViewModel by viewModels()
 
     private var _binding: FragmentStopMapBinding? = null
-
     private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mPermissionHelper = PermissionHelper(requireActivity())
-        if (!mPermissionHelper!!.hasPermission(MyPermission.FINE_LOCATION)) {
+        Timber.v("onCreate")
+
+        /**
+         * request permission
+         * nearby stop is the only functionality that needs location permission now
+         * if permission is rejected, just disable nearby stop
+         */
+        if (!permissionHelper.hasPermission(MyPermission.FINE_LOCATION)) {
+            if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                MyLocationRationaleFragment()
+                    .show(childFragmentManager, FRAGMENT_MY_LOCATION_RATIONAL)
+                return
+            }
             requestPermissions(
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                 PERMISSION_ACCESS_FINE_LOCATION
@@ -77,36 +100,16 @@ class StopMapFragment :
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = FragmentStopMapBinding.inflate(inflater, container, false)
-        setHasOptionsMenu(true)
-        binding.stopMapMapView.onCreate(savedInstanceState)
-        binding.stopMapMapView.getMapAsync {
-            mGoogleMap = it
-            mGoogleMap.uiSettings.isMapToolbarEnabled = false
-            mGoogleMap.setMapStyle(
-                MapStyleOptions.loadRawResourceStyle(
-                    requireContext(),
-                    R.raw.google_map_no_bus_stop_style
-                )
-            )
-
-            enableMyLocationButton()
-
-            onMapReady()
-
-            mGoogleMap.setOnCameraIdleListener {
-                val currentCameraLocation = Location("").apply {
-                    this.latitude = it.cameraPosition.target.latitude
-                    this.longitude = it.cameraPosition.target.longitude
-                }
-                if (mPreviousCameraLocation.distanceTo(currentCameraLocation) > noUpdateDistance) {
-                    onMovedMap(it.cameraPosition.target)
-                }
-                mPreviousCameraLocation = currentCameraLocation
-            }
+        Timber.v("onCreateView")
+        _binding = FragmentStopMapBinding.inflate(inflater, container, false).apply {
+            viewModel = this@StopMapFragment.viewModel
         }
+
+        binding.stopMapMapView.apply {
+            onCreate(savedInstanceState)
+        }
+
         binding.apply {
-            nearbyRecycleView.layoutManager = LinearLayoutManager(context)
             searchView.apply {
                 doOnLayout {
                     it.translationX = it.width - (40.dpToPx).toFloat()
@@ -121,14 +124,32 @@ class StopMapFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            binding.stopMapMapView.awaitMap().apply {
+                googleMap = this
+                enableMyLocationButton()
+                onMapReady()
+                setOnCameraIdleListener {
+                    val currentCameraLocation = Location("").also {
+                        it.latitude = this.cameraPosition.target.latitude
+                        it.longitude = this.cameraPosition.target.longitude
+                    }
+                    if (previousCameraLocation.distanceTo(currentCameraLocation) > noUpdateDistance) {
+                        onMovedMap(this.cameraPosition.target)
+                    }
+                    previousCameraLocation = currentCameraLocation
+                }
+            }
+        }
+
         repeatOnViewLifecycle {
             viewModel.nearByStop.collect {
                 withContext(Dispatchers.Main) {
-                    if (mStopMarkList.isNotEmpty()) {
+                    if (stopMarkerList.isNotEmpty()) {
                         removeMarkers()
                     }
-                    for (st in it) {
-                        addStopMarker(st)
+                    for (stopInfo in it) {
+                        addStopMarker(stopInfo)
                     }
                     updateNearbyStopList(it)
                 }
@@ -147,7 +168,7 @@ class StopMapFragment :
         Timber.i("onStart")
         super.onStart()
         binding.stopMapMapView.onStart()
-        mPermissionHelper!!.registerListener(this)
+        permissionHelper!!.registerListener(this)
     }
 
     override fun onPause() {
@@ -160,13 +181,12 @@ class StopMapFragment :
         Timber.i("onStop")
         super.onStop()
         binding.stopMapMapView.onStop()
-        mPermissionHelper!!.unregisterListener(this)
+        permissionHelper!!.unregisterListener(this)
     }
 
     override fun onDestroyView() {
         Timber.v("onDestroyView()")
-        mStopMarkList.clear()
-//        mGoogleMap.clear()
+        stopMarkerList.clear()
         binding.nearbyRecycleView.adapter = null
         binding.stopMapMapView.onDestroy()
         binding.stopMapMapView.removeAllViews()
@@ -185,9 +205,9 @@ class StopMapFragment :
     }
 
     private fun bindStopInfo(data: List<StopInfo>) {
-        mAdapter = StopsRecyclerAdapter(data, this, this)
-        mCurrentFocusStop = 0
-        binding.nearbyRecycleView.adapter = mAdapter
+        stopAdapter = StopsRecyclerAdapter(data, this, this)
+        currentFocusStop = 0
+        binding.nearbyRecycleView.adapter = stopAdapter
     }
 
     private fun scrollToStop(index: Int) {
@@ -196,41 +216,30 @@ class StopMapFragment :
         binding.nearbyRecycleView.adapter!!.notifyItemChanged(index)
     }
 
-    private fun addCurrentLocationMarker(location: Location) {
-        val here = LatLng(location.latitude, location.longitude)
-        mGoogleMap.clear()
-
-        val cameraPosition = CameraPosition.builder()
-            .target(here)
-            .zoom(16f)
-            .build()
-        mGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
-    }
-
     private fun removeMarkers() {
-        mStopMarkList.clear()
-        mGoogleMap.clear()
+        stopMarkerList.clear()
+        googleMap.clear()
     }
 
     private fun addStopMarker(st: StopInfo) {
         val nearbyStopLatLng = LatLng(st.location.latitude, st.location.longitude)
-        mStopMarkList.add(
-            mGoogleMap.addMarker(
+        stopMarkerList.add(
+            googleMap.addMarker(
                 MarkerOptions()
                     .position(nearbyStopLatLng)
                     .icon(bitmapDescriptorFromVector(requireContext(), R.drawable.ic_bus_blue_20dp))
                     .title(st.intersections)
             )
         )
-        if (mStopMarkList.size == 1) mStopMarkList[0].showInfoWindow()
-        mGoogleMap.setOnMarkerClickListener { marker ->
-            val stopList = mAdapter.mStops
+        if (stopMarkerList.size == 1) stopMarkerList[0].showInfoWindow()
+        googleMap.setOnMarkerClickListener { marker ->
+            val stopList = stopAdapter.mStops
             for (position in stopList.indices) {
                 val lat = marker.position.latitude.compareTo(stopList[position].location.latitude)
                 val lon = marker.position.longitude.compareTo(stopList[position].location.longitude)
                 if (lat == 0 && lon == 0) {
-                    previousFocusStop = mCurrentFocusStop
-                    mCurrentFocusStop = position
+                    previousFocusStop = currentFocusStop
+                    currentFocusStop = position
                     scrollToStop(position)
                 }
             }
@@ -239,22 +248,19 @@ class StopMapFragment :
     }
 
     private fun moveCameraTo(latLng: LatLng) {
-        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng))
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng))
     }
 
-    fun getFocusStop() = mCurrentFocusStop
+    fun getFocusStop() = currentFocusStop
 
     @SuppressLint("ResourceType")
     fun enableMyLocationButton() {
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_COARSE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            mGoogleMap.isMyLocationEnabled = true
+            googleMap.isMyLocationEnabled = true
             binding.stopMapMapView.findViewById<View>(
                 0x2
             ).apply {
@@ -271,7 +277,7 @@ class StopMapFragment :
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        mPermissionHelper!!.onRequestPermissionResult(requestCode, permissions, grantResults)
+        permissionHelper!!.onRequestPermissionResult(requestCode, permissions, grantResults)
     }
 
     private fun updateNearbyStopList(nearbyStopList: List<StopInfo>) {
@@ -282,7 +288,6 @@ class StopMapFragment :
         val location = Location("")
         location.latitude = latLng.latitude
         location.longitude = latLng.longitude
-//        findNearByStop(location)
         viewModel.loadNearByStop(location)
     }
 
@@ -323,11 +328,12 @@ class StopMapFragment :
 
     @SuppressLint("MissingPermission")
     private fun onMapReady() {
-        if (mPermissionHelper!!.hasPermission(MyPermission.FINE_LOCATION)) {
-
+        if (permissionHelper.hasPermission(MyPermission.FINE_LOCATION)) {
             repeatOnViewLifecycle {
-                viewModel.myLocation.collect {
-                    addCurrentLocationMarker(it)
+                viewModel.myLocationCameraUpdate.collect {
+                    it?.let {
+                        googleMap.moveCamera(it)
+                    }
                 }
             }
         }
@@ -336,16 +342,19 @@ class StopMapFragment :
     @SuppressLint("MissingPermission")
     override fun onRequestPermissionsResult(requestCode: Int, result: PermissionsResult) {
         when (requestCode) {
-            PERMISSION_ACCESS_FINE_LOCATION -> if (result.granted != null && result.granted.size > 0 && result.granted.contains(
+            PERMISSION_ACCESS_FINE_LOCATION -> if (result.granted != null
+                && result.granted.isNotEmpty()
+                && result.granted.contains(
                     MyPermission.FINE_LOCATION
                 )
             ) {
                 Timber.i("permission granted")
+                enableMyLocationButton()
                 repeatOnViewLifecycle {
-                    viewModel.myLocation.collect {
-                        enableMyLocationButton()
-//                        findNearByStop(location)
-                        addCurrentLocationMarker(it)
+                    viewModel.myLocationCameraUpdate.collect {
+                        it?.let {
+                            googleMap.moveCamera(it)
+                        }
                     }
                 }
 
@@ -361,5 +370,22 @@ class StopMapFragment :
     companion object {
         const val SEARCH_ACTIVITY_REQUEST_CODE = 199
         private const val PERMISSION_ACCESS_FINE_LOCATION = 1
+        private const val FRAGMENT_MY_LOCATION_RATIONAL = "my_location_rational"
+    }
+
+    class MyLocationRationaleFragment : DialogFragment() {
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+            return MaterialAlertDialogBuilder(requireContext())
+                .setMessage(R.string.my_location_rational)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    requireParentFragment().requestPermissions(
+                        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                        PERMISSION_ACCESS_FINE_LOCATION
+                    )
+
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .create()
+        }
     }
 }
