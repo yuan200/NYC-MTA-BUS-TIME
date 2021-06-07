@@ -15,8 +15,11 @@ import com.wen.android.mtabuscomparison.feature.stopmonitoring.BusDatabase
 import com.wen.android.mtabuscomparison.ui.commom.BaseObservableViewMvc
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class SearchViewMvcImpl(inflater: LayoutInflater, parent: ViewGroup?) :
@@ -46,42 +49,15 @@ class SearchViewMvcImpl(inflater: LayoutInflater, parent: ViewGroup?) :
                 }
 
                 override fun afterTextChanged(s: Editable?) {
-                    val searchResults = mutableListOf<SearchResultItem>()
                     if (s != null && s.toString().length > 2) {
-
-                        CoroutineScope(Dispatchers.IO).launch {
-                            try {
-                                if (Geocoder.isPresent()) {
-                                    Geocoder.isPresent()
-                                    val geocoder = Geocoder(context)
-                                    val addresses = geocoder.getFromLocationName(
-                                        s.toString(), 2,
-                                        40.496094, -74.295208,
-                                        41.020723, -73.563419
-                                    )
-                                        .map {
-                                            SearchResultItem(
-                                                "${((it.subThoroughfare ?: "") + " " + (it.thoroughfare ?: "")).ifBlank { it.featureName }}",
-                                                null, SearchItemType.MAP, it.latitude, it.longitude
-                                            )
-                                        }
-                                    searchResults.addAll(addresses)
-
+                        CoroutineScope(Dispatchers.Main).launch {
+                            getSearchResult(s.toString())
+                                .debounce(300)
+                                .collectLatest {
+                                    mSearchAdapter =
+                                        SearchRecyclerAdapter(it, this@SearchViewMvcImpl)
+                                    mRecyclerView.adapter = mSearchAdapter
                                 }
-                            } catch (e: Exception) {
-                                Timber.e(e.message)
-                            }
-                            val stops = BusDatabase.getInstance(context).busStopDao()
-                                .searchByStopNameOrId(s.toString())
-                            val results =
-                                stops.map { SearchResultItem(it.stopName ?: "", it.stopId) }
-                            searchResults.addAll(results)
-
-                            withContext(Dispatchers.Main) {
-                                mSearchAdapter =
-                                    SearchRecyclerAdapter(searchResults, this@SearchViewMvcImpl)
-                                mRecyclerView.adapter = mSearchAdapter
-                            }
                         }
                     }
                 }
@@ -89,6 +65,38 @@ class SearchViewMvcImpl(inflater: LayoutInflater, parent: ViewGroup?) :
             })
 
         }
+    }
+
+    private suspend fun getSearchResult(query: String): Flow<List<SearchResultItem>> = flow {
+        val searchResults = mutableListOf<SearchResultItem>()
+        try {
+            if (Geocoder.isPresent()) {
+                Geocoder.isPresent()
+                val geocoder = Geocoder(getContext())
+                val addresses = geocoder.getFromLocationName(
+                    query.toString(), 2,
+                    40.496094, -74.295208,
+                    41.020723, -73.563419
+                )
+                    .map {
+                        SearchResultItem(
+                            "${((it.subThoroughfare ?: "") + " " + (it.thoroughfare ?: "")).ifBlank { it.featureName }}",
+                            null, SearchItemType.MAP, it.latitude, it.longitude
+                        )
+                    }
+                searchResults.addAll(addresses)
+
+            }
+        } catch (e: Exception) {
+            Timber.e(e.message)
+        }
+        val stops = BusDatabase.getInstance(getContext()).busStopDao()
+            .searchByStopNameOrId(query.toString())
+        val results =
+            stops.map { SearchResultItem(it.stopName ?: "", it.stopId) }
+        searchResults.addAll(results)
+
+        emit(searchResults)
     }
 
     override fun onSearchResultClicked(searchResult: SearchResultItem) {
