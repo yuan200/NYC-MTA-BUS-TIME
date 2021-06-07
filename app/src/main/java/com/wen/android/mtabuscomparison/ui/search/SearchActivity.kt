@@ -67,7 +67,7 @@ class SearchActivity : AppCompatActivity(), SearchViewMvc.Listener {
         finish()
     }
 
-    fun displaySearchResult(userInput: String) {
+    private fun displaySearchResult(userInput: String) {
         val bundle = Bundle()
         bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM, userInput)
         FirebaseAnalytics.getInstance(this).logEvent(FirebaseAnalytics.Event.SEARCH, bundle)

@@ -13,6 +13,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -40,14 +41,21 @@ import com.wen.android.mtabuscomparison.util.dpToPx
 import com.wen.android.mtabuscomparison.util.fragment.repeatOnViewLifecycle
 import com.wen.android.mtabuscomparison.util.pxToDp
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.*
 import java.util.concurrent.Executors
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class StopMonitoringFragment : Fragment(),
     StopMonitoringViewMvc.FavoriteListener {
+
+    @Inject
+    lateinit var busDatabase: BusDatabase
 
     private var mGoogleMap: GoogleMap? = null
 
@@ -73,7 +81,6 @@ class StopMonitoringFragment : Fragment(),
     private var mStop: Stop? = null
 
     private lateinit var mAlertView: TextView
-    private lateinit var mLastRefreshed: TextView
     private lateinit var mAdview: AdView
     private lateinit var mFavoriteButton: AppCompatImageView
     private var mFavorite: Boolean = false
@@ -82,7 +89,7 @@ class StopMonitoringFragment : Fragment(),
     private lateinit var appBar: Toolbar
     private lateinit var tooBar: Toolbar
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
         binding = FragmentStopMonitoringBinding.inflate(layoutInflater, container, false).apply {
             stopMonitoringRecyclerView.apply {
@@ -355,19 +362,17 @@ class StopMonitoringFragment : Fragment(),
                 mStopPointName,
                 Date()
             )
-            Executors.newSingleThreadExecutor().execute {
-                mRowId = BusDatabase.getInstance(
-                    requireContext()
-                ).favoriteStopDao().insert(favorite).toInt()
+            viewLifecycleOwner.lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    mRowId = busDatabase.favoriteStopDao().insert(favorite).toInt()
+                }
             }
         }
     }
 
     fun removeFromFavorite() {
         Executors.newSingleThreadExecutor().execute {
-            BusDatabase.getInstance(
-                requireContext()
-            ).favoriteStopDao().delete(mRowId)
+            busDatabase.favoriteStopDao().delete(mRowId)
         }
     }
 
@@ -379,12 +384,6 @@ class StopMonitoringFragment : Fragment(),
             setFavorite(true)
             addToFavorite()
         }
-    }
-
-    companion object {
-        const val REQUESTED_STOP_ID = "REQUESTED_STOP_ID"
-        const val DATABASE_ROW_ID = "row_id"
-        const val FROM_FAVORITE = "favorite_checked"
     }
 
     private fun clearOldBusMarker() {

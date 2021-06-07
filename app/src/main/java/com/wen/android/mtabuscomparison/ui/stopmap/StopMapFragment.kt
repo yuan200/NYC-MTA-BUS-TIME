@@ -24,6 +24,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
@@ -41,6 +42,7 @@ import com.wen.android.mtabuscomparison.util.dpToPx
 import com.wen.android.mtabuscomparison.util.fragment.repeatOnViewLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -73,6 +75,9 @@ class StopMapFragment :
     private lateinit var stopAdapter: StopsRecyclerAdapter
 
     private val viewModel: StopMapViewModel by viewModels()
+
+    private var myLocationJob: Job? = null
+    private var myLocationOnPermissionJob: Job? = null
 
     private var _binding: FragmentStopMapBinding? = null
     private val binding get() = _binding!!
@@ -180,6 +185,8 @@ class StopMapFragment :
     override fun onStop() {
         Timber.i("onStop")
         super.onStop()
+        myLocationJob?.cancel()
+        myLocationOnPermissionJob?.cancel()
         binding.stopMapMapView.onStop()
         permissionHelper!!.unregisterListener(this)
     }
@@ -248,7 +255,14 @@ class StopMapFragment :
     }
 
     private fun moveCameraTo(latLng: LatLng) {
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng))
+        googleMap.animateCamera(
+            CameraUpdateFactory.newCameraPosition(
+                CameraPosition.builder()
+                    .target(latLng)
+                    .zoom(17f)
+                    .build()
+            )
+        )
     }
 
     fun getFocusStop() = currentFocusStop
@@ -328,13 +342,21 @@ class StopMapFragment :
 
     @SuppressLint("MissingPermission")
     private fun onMapReady() {
+        Timber.v("onMapReady()")
         if (permissionHelper.hasPermission(MyPermission.FINE_LOCATION)) {
-            repeatOnViewLifecycle {
-                viewModel.myLocationCameraUpdate.collect {
-                    it?.let {
-                        googleMap.moveCamera(it)
+            /**
+             * one shot update
+             * doesn't want to repeat this after onStop
+             *
+             */
+            myLocationJob = viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+                viewModel.myLocationCameraUpdate
+                    .collect {
+                        it?.let {
+                            Timber.v("collecting from myLocationCameraUpdate, onMapReady()")
+                            googleMap.moveCamera(it)
+                        }
                     }
-                }
             }
         }
     }
@@ -350,12 +372,22 @@ class StopMapFragment :
             ) {
                 Timber.i("permission granted")
                 enableMyLocationButton()
-                repeatOnViewLifecycle {
-                    viewModel.myLocationCameraUpdate.collect {
-                        it?.let {
-                            googleMap.moveCamera(it)
-                        }
+
+                /**
+                 * one shot update
+                 * doesn't want to repeat this after onStop
+                 */
+                myLocationOnPermissionJob = viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+                    binding.stopMapMapView.awaitMap().apply {
+                        viewModel.myLocationCameraUpdate
+                            .collect {
+                                it?.let {
+                                    Timber.v("collecting from myLocationCameraUpdate")
+                                    googleMap.moveCamera(it)
+                                }
+                            }
                     }
+
                 }
 
             } else {
@@ -382,7 +414,6 @@ class StopMapFragment :
                         arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                         PERMISSION_ACCESS_FINE_LOCATION
                     )
-
                 }
                 .setNegativeButton(android.R.string.cancel, null)
                 .create()
