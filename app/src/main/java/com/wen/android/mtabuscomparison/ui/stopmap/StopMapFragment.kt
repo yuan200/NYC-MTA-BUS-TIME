@@ -26,7 +26,6 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.maps.android.ktx.awaitMap
@@ -64,8 +63,7 @@ class StopMapFragment :
     private var currentFocusStop = 0
     private var previousFocusStop = Integer.MAX_VALUE
 
-    private lateinit var googleMap: GoogleMap
-    private val stopMarkerList = mutableListOf<Marker>()
+    //    private val stopMarkerList = mutableListOf<Marker>()
     private val noUpdateDistance = 200
     private var previousCameraLocation = Location("").apply {
         this.latitude = 0.0
@@ -131,9 +129,22 @@ class StopMapFragment :
 
         viewLifecycleOwner.lifecycleScope.launch {
             binding.stopMapMapView.awaitMap().apply {
-                googleMap = this
-                enableMyLocationButton()
-                onMapReady()
+
+                setOnMarkerClickListener { marker ->
+                    val stopList = stopAdapter.mStops
+                    for (position in stopList.indices) {
+                        val lat = marker.position.latitude.compareTo(stopList[position].location.latitude)
+                        val lon = marker.position.longitude.compareTo(stopList[position].location.longitude)
+                        if (lat == 0 && lon == 0) {
+                            previousFocusStop = currentFocusStop
+                            currentFocusStop = position
+                            scrollToStop(position)
+                        }
+                    }
+                    false
+                }
+                enableMyLocationButton(this)
+                onMapReady(this)
                 setOnCameraIdleListener {
                     val currentCameraLocation = Location("").also {
                         it.latitude = this.cameraPosition.target.latitude
@@ -150,9 +161,7 @@ class StopMapFragment :
         repeatOnViewLifecycle {
             viewModel.nearByStop.collect {
                 withContext(Dispatchers.Main) {
-                    if (stopMarkerList.isNotEmpty()) {
-                        removeMarkers()
-                    }
+                    removeMarkers()
                     for (stopInfo in it) {
                         addStopMarker(stopInfo)
                     }
@@ -173,7 +182,7 @@ class StopMapFragment :
         Timber.i("onStart")
         super.onStart()
         binding.stopMapMapView.onStart()
-        permissionHelper!!.registerListener(this)
+        permissionHelper.registerListener(this)
     }
 
     override fun onPause() {
@@ -188,12 +197,11 @@ class StopMapFragment :
         myLocationJob?.cancel()
         myLocationOnPermissionJob?.cancel()
         binding.stopMapMapView.onStop()
-        permissionHelper!!.unregisterListener(this)
+        permissionHelper.unregisterListener(this)
     }
 
     override fun onDestroyView() {
         Timber.v("onDestroyView()")
-        stopMarkerList.clear()
         binding.nearbyRecycleView.adapter = null
         binding.stopMapMapView.onDestroy()
         binding.stopMapMapView.removeAllViews()
@@ -224,57 +232,50 @@ class StopMapFragment :
     }
 
     private fun removeMarkers() {
-        stopMarkerList.clear()
-        googleMap.clear()
+        viewLifecycleOwner.lifecycleScope.launch {
+            val map = binding.stopMapMapView.awaitMap()
+            map.clear()
+        }
     }
 
     private fun addStopMarker(st: StopInfo) {
         val nearbyStopLatLng = LatLng(st.location.latitude, st.location.longitude)
-        stopMarkerList.add(
-            googleMap.addMarker(
+        viewLifecycleOwner.lifecycleScope.launch {
+            val map = binding.stopMapMapView.awaitMap()
+            map.addMarker(
                 MarkerOptions()
                     .position(nearbyStopLatLng)
                     .icon(bitmapDescriptorFromVector(requireContext(), R.drawable.ic_bus_blue_20dp))
                     .title(st.intersections)
             )
-        )
-        if (stopMarkerList.size == 1) stopMarkerList[0].showInfoWindow()
-        googleMap.setOnMarkerClickListener { marker ->
-            val stopList = stopAdapter.mStops
-            for (position in stopList.indices) {
-                val lat = marker.position.latitude.compareTo(stopList[position].location.latitude)
-                val lon = marker.position.longitude.compareTo(stopList[position].location.longitude)
-                if (lat == 0 && lon == 0) {
-                    previousFocusStop = currentFocusStop
-                    currentFocusStop = position
-                    scrollToStop(position)
-                }
-            }
-            false
         }
     }
 
     private fun moveCameraTo(latLng: LatLng) {
-        googleMap.animateCamera(
-            CameraUpdateFactory.newCameraPosition(
-                CameraPosition.builder()
-                    .target(latLng)
-                    .zoom(17f)
-                    .build()
+        viewLifecycleOwner.lifecycleScope.launch {
+            val map = binding.stopMapMapView.awaitMap()
+            map.animateCamera(
+                CameraUpdateFactory.newCameraPosition(
+                    CameraPosition.builder()
+                        .target(latLng)
+                        .zoom(17f)
+                        .build()
+                )
             )
-        )
+        }
+
     }
 
     fun getFocusStop() = currentFocusStop
 
     @SuppressLint("ResourceType")
-    fun enableMyLocationButton() {
+    fun enableMyLocationButton(map: GoogleMap) {
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            googleMap.isMyLocationEnabled = true
+            map.isMyLocationEnabled = true
             binding.stopMapMapView.findViewById<View>(
                 0x2
             ).apply {
@@ -291,7 +292,7 @@ class StopMapFragment :
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        permissionHelper!!.onRequestPermissionResult(requestCode, permissions, grantResults)
+        permissionHelper.onRequestPermissionResult(requestCode, permissions, grantResults)
     }
 
     private fun updateNearbyStopList(nearbyStopList: List<StopInfo>) {
@@ -341,7 +342,7 @@ class StopMapFragment :
     }
 
     @SuppressLint("MissingPermission")
-    private fun onMapReady() {
+    private fun onMapReady(map : GoogleMap) {
         Timber.v("onMapReady()")
         if (permissionHelper.hasPermission(MyPermission.FINE_LOCATION)) {
             /**
@@ -354,7 +355,7 @@ class StopMapFragment :
                     .collect {
                         it?.let {
                             Timber.v("collecting from myLocationCameraUpdate, onMapReady()")
-                            googleMap.moveCamera(it)
+                            map.moveCamera(it)
                         }
                     }
             }
@@ -371,7 +372,6 @@ class StopMapFragment :
                 )
             ) {
                 Timber.i("permission granted")
-                enableMyLocationButton()
 
                 /**
                  * one shot update
@@ -379,11 +379,12 @@ class StopMapFragment :
                  */
                 myLocationOnPermissionJob = viewLifecycleOwner.lifecycleScope.launchWhenStarted {
                     binding.stopMapMapView.awaitMap().apply {
+                        enableMyLocationButton(this)
                         viewModel.myLocationCameraUpdate
                             .collect {
                                 it?.let {
                                     Timber.v("collecting from myLocationCameraUpdate")
-                                    googleMap.moveCamera(it)
+                                    this.moveCamera(it)
                                 }
                             }
                     }
