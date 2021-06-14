@@ -15,10 +15,7 @@ import com.wen.android.mtabuscomparison.feature.stopmonitoring.BusDatabase
 import com.wen.android.mtabuscomparison.ui.commom.BaseObservableViewMvc
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -97,7 +94,7 @@ class SearchViewMvcImpl(inflater: LayoutInflater, parent: ViewGroup?) :
         searchResults.addAll(results)
 
         emit(searchResults)
-    }
+    }.flowOn(Dispatchers.IO)
 
     override fun onSearchResultClicked(searchResult: SearchResultItem) {
         for (listener in getListeners()) {
