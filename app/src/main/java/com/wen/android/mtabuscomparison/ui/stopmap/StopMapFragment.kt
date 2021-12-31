@@ -328,7 +328,7 @@ class StopMapFragment :
                     val navController = NavHostFragment.findNavController(this)
                     navController.navigate(
                         StopMapFragmentDirections.actionStopMapFragmentToStopMonitoringFragment(
-                            data.getStringExtra(getString(R.string.SEARCH_RESULT_STOP_CODE))
+                            data.getStringExtra(getString(R.string.SEARCH_RESULT_STOP_CODE))!!
                         )
                     )
                 } else {

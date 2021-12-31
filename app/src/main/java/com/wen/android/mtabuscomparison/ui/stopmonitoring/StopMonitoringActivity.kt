@@ -21,7 +21,7 @@ class StopMonitoringActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_stop_monitoring_2)
         if (intent.hasExtra(Intent.EXTRA_TEXT)) {
-            mStopId = intent.getStringExtra(Intent.EXTRA_TEXT)
+            mStopId = intent.getStringExtra(Intent.EXTRA_TEXT)!!
             val stopMonitoringFragment = StopMonitoringFragment()
             val bundle = Bundle().apply {
                 putString("stopId", mStopId)
