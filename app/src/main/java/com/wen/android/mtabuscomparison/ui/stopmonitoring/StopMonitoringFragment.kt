@@ -264,7 +264,7 @@ class StopMonitoringFragment : Fragment(),
                                         )
                                     )
                                     .title(mViewModel.targetPublishedLineName.value)
-                            )
+                            )!!
                         )
                     }
                 }
