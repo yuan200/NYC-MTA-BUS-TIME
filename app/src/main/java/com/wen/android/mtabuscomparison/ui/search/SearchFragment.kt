@@ -1,35 +1,41 @@
 package com.wen.android.mtabuscomparison.ui.search
 
 import android.app.Activity
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.NavHostFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.wen.android.mtabuscomparison.R
-import com.wen.android.mtabuscomparison.feature.search.SearchItemType
 import com.wen.android.mtabuscomparison.feature.search.SearchResultItem
+import com.wen.android.mtabuscomparison.feature.search.SearchType
 import com.wen.android.mtabuscomparison.ui.routesview.RoutesViewActivity
 import com.wen.android.mtabuscomparison.util.SearchHandler
 import java.util.*
 
 
-class SearchActivity : AppCompatActivity(), SearchViewMvc.Listener {
+class SearchFragment : Fragment(), SearchViewMvc.Listener {
     private lateinit var mSearchView: SearchViewMvc
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        super.onCreateView(inflater, container, savedInstanceState)
 
         mSearchView = SearchViewMvcImpl(layoutInflater, null).also {
             it.registerListener(this)
         }
-        setContentView(mSearchView.getRootView())
 
         mSearchView.getSearchET().setOnEditorActionListener { v, _, _ ->
             displaySearchResult(v.text.toString())
             true
         }
+
+        return mSearchView.getRootView()
     }
 
     override fun onStart() {
@@ -44,45 +50,42 @@ class SearchActivity : AppCompatActivity(), SearchViewMvc.Listener {
 
     override fun onSearchResultClicked(searchResult: SearchResultItem) {
         when (searchResult.type) {
-            SearchItemType.STOP -> {
-                finishAndSearchStop(searchResult.stopId!!)
+            SearchType.STOP -> {
+                searchStop(searchResult.stopId!!)
             }
-            SearchItemType.MAP -> {
-                hideKeyboard(this)
-                val intent = Intent().apply {
-                    val latLng = LatLng(searchResult.lat!!, searchResult.lng!!)
-                    putExtra(getString(R.string.SEARCH_RESULT_POINT), latLng)
+            SearchType.MAP -> {
+                hideKeyboard(requireActivity())
+                val latLng = LatLng(searchResult.lat!!, searchResult.lng!!)
+                NavHostFragment.findNavController(this).apply {
+                    previousBackStackEntry?.savedStateHandle?.set(getString(R.string.SEARCH_RESULT_POINT), latLng)
+                    popBackStack()
                 }
-                setResult(Activity.RESULT_OK, intent)
-                finish()
             }
         }
     }
 
-    private fun finishAndSearchStop(stopId: String) {
-        val stopCodeIntent = Intent().apply {
-            putExtra(getString(R.string.SEARCH_RESULT_STOP_CODE), stopId)
+    private fun searchStop(stopId: String) {
+        NavHostFragment.findNavController(this).apply {
+            navigate(SearchFragmentDirections.actionSearchFragmentToStopMonitoringFragment(stopId))
         }
-        setResult(Activity.RESULT_OK, stopCodeIntent)
-        finish()
     }
 
     private fun displaySearchResult(userInput: String) {
         val bundle = Bundle()
         bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM, userInput)
-        FirebaseAnalytics.getInstance(this).logEvent(FirebaseAnalytics.Event.SEARCH, bundle)
+        FirebaseAnalytics.getInstance(requireContext()).logEvent(FirebaseAnalytics.Event.SEARCH, bundle)
         val searchHandler = SearchHandler(userInput)
-        if (searchHandler.keywordType() == 0) {
+        if (searchHandler.keywordType() == SearchType.STOP) {
             val stopcodeArray = arrayOfNulls<String>(1)
             //get the bus code from the user input
             stopcodeArray[0] = userInput
             if (stopcodeArray[0] == null) {
                 return
             }
-            finishAndSearchStop(stopcodeArray[0]!!)
+            searchStop(stopcodeArray[0]!!)
         } else {
             val routeEntered = userInput.toUpperCase(Locale.US)
-            val intent = Intent(this, RoutesViewActivity::class.java)
+            val intent = Intent(requireContext(), RoutesViewActivity::class.java)
             intent.putExtra(Intent.EXTRA_TEXT, routeEntered)
             startActivity(intent)
         }

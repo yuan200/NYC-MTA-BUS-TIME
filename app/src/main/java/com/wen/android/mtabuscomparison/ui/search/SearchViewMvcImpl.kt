@@ -9,7 +9,7 @@ import android.widget.EditText
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.wen.android.mtabuscomparison.R
-import com.wen.android.mtabuscomparison.feature.search.SearchItemType
+import com.wen.android.mtabuscomparison.feature.search.SearchType
 import com.wen.android.mtabuscomparison.feature.search.SearchResultItem
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.BusDatabase
 import com.wen.android.mtabuscomparison.ui.commom.BaseObservableViewMvc
@@ -28,7 +28,7 @@ class SearchViewMvcImpl(inflater: LayoutInflater, parent: ViewGroup?) :
     private lateinit var mSearchAdapter: SearchRecyclerAdapter
 
     init {
-        setRootView(inflater.inflate(R.layout.activity_search, parent, false))
+        setRootView(inflater.inflate(R.layout.fragment_search, parent, false))
 
         mRecyclerView = findViewById(R.id.search_recycler)
         mRecyclerView.layoutManager = LinearLayoutManager(getContext())
@@ -78,7 +78,7 @@ class SearchViewMvcImpl(inflater: LayoutInflater, parent: ViewGroup?) :
                     .map {
                         SearchResultItem(
                             "${((it.subThoroughfare ?: "") + " " + (it.thoroughfare ?: "")).ifBlank { it.featureName }}",
-                            null, SearchItemType.MAP, it.latitude, it.longitude
+                            null, SearchType.MAP, it.latitude, it.longitude
                         )
                     }
                 searchResults.addAll(addresses)

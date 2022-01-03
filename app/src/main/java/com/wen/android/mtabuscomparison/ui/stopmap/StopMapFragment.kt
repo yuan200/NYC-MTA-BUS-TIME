@@ -3,7 +3,6 @@ package com.wen.android.mtabuscomparison.ui.stopmap
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.ActivityOptions
 import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -35,7 +34,6 @@ import com.wen.android.mtabuscomparison.common.permission.PermissionHelper
 import com.wen.android.mtabuscomparison.common.permission.PermissionHelper.PermissionsResult
 import com.wen.android.mtabuscomparison.databinding.FragmentStopMapBinding
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopInfo
-import com.wen.android.mtabuscomparison.ui.search.SearchActivity
 import com.wen.android.mtabuscomparison.util.bitmapDescriptorFromVector
 import com.wen.android.mtabuscomparison.util.dpToPx
 import com.wen.android.mtabuscomparison.util.fragment.repeatOnViewLifecycle
@@ -126,6 +124,15 @@ class StopMapFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        NavHostFragment.findNavController(this).apply {
+            currentBackStackEntry?.savedStateHandle?.getLiveData<LatLng>(getString(R.string.SEARCH_RESULT_POINT))
+                ?.observe(viewLifecycleOwner) { latLng ->
+                    Timber.i("result from search $latLng")
+                    currentBackStackEntry?.savedStateHandle?.remove<LatLng>(getString(R.string.SEARCH_RESULT_POINT))
+                    moveCameraTo(latLng)
+                }
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             binding.stopMapMapView.awaitMap().apply {
@@ -314,23 +321,21 @@ class StopMapFragment :
     }
 
     private fun onStartSearch() {
-        startActivityForResult(
-            Intent(context, SearchActivity::class.java),
-            SEARCH_ACTIVITY_REQUEST_CODE,
-            ActivityOptions.makeSceneTransitionAnimation(activity).toBundle()
-        )
+        NavHostFragment.findNavController(this).apply {
+            navigate(StopMapFragmentDirections.actionStopMapFragmentToSearchFragment())
+        }
+//        startActivityForResult(
+//            Intent(context, SearchFragment::class.java),
+//            SEARCH_ACTIVITY_REQUEST_CODE,
+//            ActivityOptions.makeSceneTransitionAnimation(activity).toBundle()
+//        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == SEARCH_ACTIVITY_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 if (data!!.hasExtra(getString(R.string.SEARCH_RESULT_STOP_CODE))) {
-                    val navController = NavHostFragment.findNavController(this)
-                    navController.navigate(
-                        StopMapFragmentDirections.actionStopMapFragmentToStopMonitoringFragment(
-                            data.getStringExtra(getString(R.string.SEARCH_RESULT_STOP_CODE))!!
-                        )
-                    )
+                    goToStopMonitoringFragment(data.getStringExtra(getString(R.string.SEARCH_RESULT_STOP_CODE))!!)
                 } else {
                     val latlng = data.getParcelableExtra<Parcelable>(getString(R.string.SEARCH_RESULT_POINT)) as LatLng
                     moveCameraTo(latlng)
@@ -341,8 +346,15 @@ class StopMapFragment :
         }
     }
 
+    private fun goToStopMonitoringFragment(stopCode: String) {
+        val navController = NavHostFragment.findNavController(this)
+        navController.navigate(
+            StopMapFragmentDirections.actionStopMapFragmentToStopMonitoringFragment(stopCode)
+        )
+    }
+
     @SuppressLint("MissingPermission")
-    private fun onMapReady(map : GoogleMap) {
+    private fun onMapReady(map: GoogleMap) {
         Timber.v("onMapReady()")
         if (permissionHelper.hasPermission(MyPermission.FINE_LOCATION)) {
             /**

@@ -5,7 +5,7 @@
     <data>
         <variable
             name="itemType"
-            type="com.wen.android.mtabuscomparison.feature.search.SearchItemType" />
+            type="com.wen.android.mtabuscomparison.feature.search.SearchType" />
     </data>
 
     <LinearLayout
@@ -19,7 +19,7 @@
             android:layout_gravity="center"
             android:paddingStart="@dimen/grid_2"
             android:contentDescription="@string/search_result_type"
-            android:src="@{itemType == com.wen.android.mtabuscomparison.feature.search.SearchItemType.MAP ? @drawable/ic_baseline_map_24 : @drawable/ic_bus_blue_24dp}" />
+            android:src="@{itemType == com.wen.android.mtabuscomparison.feature.search.SearchType.MAP ? @drawable/ic_baseline_map_24 : @drawable/ic_bus_blue_24dp}" />
 
         <TextView
             android:id="@+id/search_result_title"

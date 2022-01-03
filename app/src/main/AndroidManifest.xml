@@ -32,7 +32,7 @@
             android:theme="@style/MainActivityTheme"
             android:windowSoftInputMode="adjustPan">
         </activity>
-        <activity android:name=".ui.search.SearchActivity" />
+        <activity android:name=".ui.search.SearchFragment" />
         <activity android:name=".ui.stopmonitoring.StopMonitoringActivity" />
 
         <uses-library
