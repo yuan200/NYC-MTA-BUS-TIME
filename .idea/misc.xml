@@ -28,9 +28,11 @@
         <entry key="app/src/main/res/layout/activity_search.xml" value="0.1625" />
         <entry key="app/src/main/res/layout/activity_stop_monitoring.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_stop_monitoring_2.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_base.xml" value="0.21458333333333332" />
         <entry key="app/src/main/res/layout/fragment_favorite.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_favorite2.xml" value="0.335" />
         <entry key="app/src/main/res/layout/fragment_save_favorite.xml" value="0.17291666666666666" />
+        <entry key="app/src/main/res/layout/fragment_search.xml" value="0.22395833333333334" />
         <entry key="app/src/main/res/layout/fragment_stop_map.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_stop_monitoring.xml" value="0.17831813576494426" />
         <entry key="app/src/main/res/layout/list_item_bus.xml" value="0.335" />

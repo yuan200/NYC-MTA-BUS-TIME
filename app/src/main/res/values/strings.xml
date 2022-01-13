@@ -27,4 +27,6 @@
     <string name="enter_route_number_or_stop_number">Enter route number or stop number</string>
     <string name="error_unable_to_track">Sorry, we are unable to track the bus you asked</string>
     <string name="my_location_rational">The app needs location permission to show the nearby bus stops on the map</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

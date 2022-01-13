@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.os.Handler
 import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
@@ -21,12 +22,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
+import androidx.transition.TransitionInflater
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.logEvent
 import com.google.maps.android.ktx.awaitMap
 import com.wen.android.mtabuscomparison.R
 import com.wen.android.mtabuscomparison.common.permission.MyPermission
@@ -57,6 +61,9 @@ class StopMapFragment :
 
     @Inject
     lateinit var permissionHelper: PermissionHelper
+
+    @Inject
+    lateinit var firebaseAnalytics: FirebaseAnalytics
 
     private var currentFocusStop = 0
     private var previousFocusStop = Integer.MAX_VALUE
@@ -130,7 +137,9 @@ class StopMapFragment :
                 ?.observe(viewLifecycleOwner) { latLng ->
                     Timber.i("result from search $latLng")
                     currentBackStackEntry?.savedStateHandle?.remove<LatLng>(getString(R.string.SEARCH_RESULT_POINT))
-                    moveCameraTo(latLng)
+                    Handler().postDelayed(Runnable {
+                        moveCameraTo(latLng)
+                    }, 300)
                 }
         }
 
@@ -183,6 +192,10 @@ class StopMapFragment :
         Timber.i("onResume")
         super.onResume()
         binding.stopMapMapView.onResume()
+
+        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
+            param(FirebaseAnalytics.Param.SCREEN_NAME, StopMapFragment::class.java.simpleName)
+        }
     }
 
     override fun onStart() {
@@ -261,6 +274,7 @@ class StopMapFragment :
     private fun moveCameraTo(latLng: LatLng) {
         viewLifecycleOwner.lifecycleScope.launch {
             val map = binding.stopMapMapView.awaitMap()
+            Timber.i("move camera to $latLng")
             map.animateCamera(
                 CameraUpdateFactory.newCameraPosition(
                     CameraPosition.builder()
@@ -321,14 +335,11 @@ class StopMapFragment :
     }
 
     private fun onStartSearch() {
+        val inflater = TransitionInflater.from(requireContext())
+        exitTransition = inflater.inflateTransition(R.transition.explode)
         NavHostFragment.findNavController(this).apply {
             navigate(StopMapFragmentDirections.actionStopMapFragmentToSearchFragment())
         }
-//        startActivityForResult(
-//            Intent(context, SearchFragment::class.java),
-//            SEARCH_ACTIVITY_REQUEST_CODE,
-//            ActivityOptions.makeSceneTransitionAnimation(activity).toBundle()
-//        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

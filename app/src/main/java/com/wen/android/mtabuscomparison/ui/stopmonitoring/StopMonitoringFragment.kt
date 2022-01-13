@@ -28,6 +28,8 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.logEvent
 import com.wen.android.mtabuscomparison.R
 import com.wen.android.mtabuscomparison.common.Result
 import com.wen.android.mtabuscomparison.databinding.FragmentStopMonitoringBinding
@@ -56,6 +58,9 @@ class StopMonitoringFragment : Fragment(),
 
     @Inject
     lateinit var busDatabase: BusDatabase
+
+    @Inject
+    lateinit var firebaseAnalytics: FirebaseAnalytics
 
     private var mGoogleMap: GoogleMap? = null
 
@@ -293,6 +298,10 @@ class StopMonitoringFragment : Fragment(),
         Timber.i("onResume")
 
         mAdview.resume()
+
+        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
+            param(FirebaseAnalytics.Param.SCREEN_NAME, StopMonitoringFragment::class.java.simpleName)
+        }
     }
 
     override fun onPause() {

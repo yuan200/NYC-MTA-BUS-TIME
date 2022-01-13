@@ -18,6 +18,8 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.logEvent
 import com.wen.android.mtabuscomparison.BaseApp
 import com.wen.android.mtabuscomparison.R
 import com.wen.android.mtabuscomparison.databinding.FragmentFavoriteBinding
@@ -31,10 +33,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.*
+import javax.inject.Inject
 import kotlin.collections.ArrayList
 
 @AndroidEntryPoint
 class FavoriteFragment : Fragment(), FavoriteAdapter.OnFavoriteClickedListener {
+
+    @Inject
+    lateinit var firebaseAnalytics: FirebaseAnalytics
 
     private var mAdapter: FavoriteAdapter? = null
 
@@ -186,6 +192,9 @@ class FavoriteFragment : Fragment(), FavoriteAdapter.OnFavoriteClickedListener {
     override fun onResume() {
         super.onResume()
         Timber.i("onResume")
+        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
+            param(FirebaseAnalytics.Param.SCREEN_NAME, FavoriteFragment::class.java.simpleName)
+        }
     }
 
     private fun getBusStopCode(favoriteList: List<FavoriteStop>): List<Favorite>? {

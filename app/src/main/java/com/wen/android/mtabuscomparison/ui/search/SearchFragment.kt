@@ -12,15 +12,23 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.logEvent
 import com.wen.android.mtabuscomparison.R
 import com.wen.android.mtabuscomparison.feature.search.SearchResultItem
 import com.wen.android.mtabuscomparison.feature.search.SearchType
 import com.wen.android.mtabuscomparison.ui.routesview.RoutesViewActivity
 import com.wen.android.mtabuscomparison.util.SearchHandler
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
+import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class SearchFragment : Fragment(), SearchViewMvc.Listener {
+
+    @Inject
+    lateinit var firebaseAnalytics:FirebaseAnalytics
+
     private lateinit var mSearchView: SearchViewMvc
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -41,6 +49,13 @@ class SearchFragment : Fragment(), SearchViewMvc.Listener {
     override fun onStart() {
         super.onStart()
         mSearchView.registerListener(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
+            param(FirebaseAnalytics.Param.SCREEN_NAME, SearchFragment::class.java.simpleName)
+        }
     }
 
     override fun onStop() {
