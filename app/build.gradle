@@ -11,7 +11,7 @@ plugins {
 
 android {
     compileSdkVersion 31
-    buildToolsVersion "30.0.2"
+    buildToolsVersion "30.0.3"
 
     def versionPropsFile = file("version.properties")
     def buildNumber
