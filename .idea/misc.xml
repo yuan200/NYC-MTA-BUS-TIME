@@ -23,16 +23,14 @@
         <entry key="app/src/main/res/drawable/splash_screen.xml" value="0.26875" />
         <entry key="app/src/main/res/drawable/twotone_directions_bus_filled_24.xml" value="0.3828125" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.16666666666666666" />
-        <entry key="app/src/main/res/layout/activity_routes_view.xml" value="0.36666666666666664" />
         <entry key="app/src/main/res/layout/activity_save_comparison.xml" value="0.17291666666666666" />
         <entry key="app/src/main/res/layout/activity_search.xml" value="0.1625" />
         <entry key="app/src/main/res/layout/activity_stop_monitoring.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_stop_monitoring_2.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/fragment_base.xml" value="0.21458333333333332" />
+        <entry key="app/src/main/res/layout/fragment_base.xml" value="0.18795289855072464" />
         <entry key="app/src/main/res/layout/fragment_favorite.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_favorite2.xml" value="0.335" />
         <entry key="app/src/main/res/layout/fragment_save_favorite.xml" value="0.17291666666666666" />
-        <entry key="app/src/main/res/layout/fragment_search.xml" value="0.22395833333333334" />
         <entry key="app/src/main/res/layout/fragment_stop_map.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_stop_monitoring.xml" value="0.17831813576494426" />
         <entry key="app/src/main/res/layout/list_item_bus.xml" value="0.335" />

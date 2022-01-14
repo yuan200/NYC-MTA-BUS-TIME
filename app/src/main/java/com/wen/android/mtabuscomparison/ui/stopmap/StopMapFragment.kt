@@ -335,8 +335,6 @@ class StopMapFragment :
     }
 
     private fun onStartSearch() {
-        val inflater = TransitionInflater.from(requireContext())
-        exitTransition = inflater.inflateTransition(R.transition.explode)
         NavHostFragment.findNavController(this).apply {
             navigate(StopMapFragmentDirections.actionStopMapFragmentToSearchFragment())
         }
