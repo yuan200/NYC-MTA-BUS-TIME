@@ -35,7 +35,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 31
         versionCode buildNumber
-        versionName "2.07" + "." + buildNumber.toString()
+        versionName "2.08" + "." + buildNumber.toString()
         testInstrumentationRunner "com.wen.android.mtabuscomparison.CustomTestRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
@@ -194,7 +194,7 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
-    implementation 'androidx.appcompat:appcompat:1.4.0'
+    implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'com.google.android.material:material:1.6.0-alpha01'
     implementation 'androidx.vectordrawable:vectordrawable:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
@@ -283,7 +283,7 @@ dependencies {
     testImplementation "io.mockk:mockk:1.10.4"
 
     //Testing coroutines
-    def coroutines_test_version = "1.5.0"
+    def coroutines_test_version = "1.6.0"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_test_version"
     testImplementation 'app.cash.turbine:turbine:0.5.1'
 

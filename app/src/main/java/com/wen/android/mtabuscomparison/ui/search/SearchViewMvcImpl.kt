@@ -1,22 +1,20 @@
 package com.wen.android.mtabuscomparison.ui.search
 
 import android.location.Geocoder
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.EditText
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.wen.android.mtabuscomparison.R
-import com.wen.android.mtabuscomparison.feature.search.SearchType
 import com.wen.android.mtabuscomparison.feature.search.SearchResultItem
+import com.wen.android.mtabuscomparison.feature.search.SearchType
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.BusDatabase
 import com.wen.android.mtabuscomparison.ui.commom.BaseObservableViewMvc
+import com.wen.android.mtabuscomparison.ui.textChanges
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class SearchViewMvcImpl(inflater: LayoutInflater, parent: ViewGroup?) :
@@ -32,36 +30,15 @@ class SearchViewMvcImpl(inflater: LayoutInflater, parent: ViewGroup?) :
 
         mRecyclerView = findViewById(R.id.search_recycler)
         mRecyclerView.layoutManager = LinearLayoutManager(getContext())
-        mSearchField = findViewById<EditText>(R.id.search_field).apply {
-            addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) {
-                }
-
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                }
-
-                override fun afterTextChanged(s: Editable?) {
-                    if (s != null && s.toString().length > 2) {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            getSearchResult(s.toString())
-                                .debounce(300)
-                                .collectLatest {
-                                    mSearchAdapter =
-                                        SearchRecyclerAdapter(it, this@SearchViewMvcImpl)
-                                    mRecyclerView.adapter = mSearchAdapter
-                                }
-                        }
-                    }
-                }
-
-            })
-
-        }
+        mSearchField = findViewById<EditText>(R.id.search_field)
+        mSearchField.textChanges().debounce(300)
+            .filter { !it.isNullOrBlank() }
+            .flatMapConcat { getSearchResult(it.toString()) }
+            .onEach {
+                mSearchAdapter = SearchRecyclerAdapter(it, this@SearchViewMvcImpl)
+                mRecyclerView.adapter = mSearchAdapter
+            }
+            .launchIn(CoroutineScope(Dispatchers.Main))
     }
 
     private suspend fun getSearchResult(query: String): Flow<List<SearchResultItem>> = flow {
@@ -82,7 +59,6 @@ class SearchViewMvcImpl(inflater: LayoutInflater, parent: ViewGroup?) :
                         )
                     }
                 searchResults.addAll(addresses)
-
             }
         } catch (e: Exception) {
             Timber.e(e.message)
