@@ -43,6 +43,12 @@ class SearchViewMvcImpl(inflater: LayoutInflater, parent: ViewGroup?) :
 
     private suspend fun getSearchResult(query: String): Flow<List<SearchResultItem>> = flow {
         val searchResults = mutableListOf<SearchResultItem>()
+
+        val route = BusDatabase.getInstance(getContext()).busStopDao().searchByRouteId(query.uppercase())
+        route?.hasRoute(query)?.let {
+            searchResults.add(SearchResultItem(query.uppercase(), "", SearchType.ROUTE))
+        }
+
         try {
             if (Geocoder.isPresent()) {
                 Geocoder.isPresent()

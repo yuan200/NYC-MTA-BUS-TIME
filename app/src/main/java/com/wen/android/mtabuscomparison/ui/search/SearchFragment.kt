@@ -76,6 +76,9 @@ class SearchFragment : Fragment(), SearchViewMvc.Listener {
                     popBackStack()
                 }
             }
+            SearchType.ROUTE -> {
+                viewRoute(searchResult.name)
+            }
         }
     }
 
@@ -100,9 +103,7 @@ class SearchFragment : Fragment(), SearchViewMvc.Listener {
             searchStop(stopcodeArray[0]!!)
         } else {
             val routeEntered = userInput.toUpperCase(Locale.US)
-            val intent = Intent(requireContext(), RoutesViewActivity::class.java)
-            intent.putExtra(Intent.EXTRA_TEXT, routeEntered)
-            startActivity(intent)
+            viewRoute(routeEntered)
         }
     }
     private fun hideKeyboard(activity: Activity) {
@@ -114,5 +115,14 @@ class SearchFragment : Fragment(), SearchViewMvc.Listener {
             view = View(activity)
         }
         imm.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
+    /**
+     * @param route need to be uppercase
+     */
+    private fun viewRoute(route: String) {
+        val intent = Intent(requireContext(), RoutesViewActivity::class.java)
+        intent.putExtra(Intent.EXTRA_TEXT, route)
+        startActivity(intent)
     }
 }

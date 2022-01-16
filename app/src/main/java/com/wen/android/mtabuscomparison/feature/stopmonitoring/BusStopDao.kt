@@ -24,6 +24,9 @@ interface BusStopDao {
     @Query("SELECT * FROM stops WHERE stop_name LIKE '%' || :query || '%' OR stop_id = :query")
     suspend fun searchByStopNameOrId(query: String): List<Stop>
 
+    @Query("SELECT * FROM stops WHERE route_id Like '%' || :query || '%' LIMIT 1")
+    suspend fun searchByRouteId(query: String): Stop?
+
     @Query("SELECT * FROM stops WHERE stop_id = :stopId LIMIT 1")
     fun getStop(stopId: String): Flow<Stop>
 }
