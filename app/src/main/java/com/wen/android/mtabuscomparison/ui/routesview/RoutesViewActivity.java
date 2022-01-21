@@ -23,6 +23,7 @@ import com.wen.android.mtabuscomparison.util.NetworkUtilities;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -84,7 +85,7 @@ public class RoutesViewActivity extends AppCompatActivity {
             URL searchUrl;
             String code = "nothing";
             String busTimeInqueryResult = null;
-            BusDirection routes = new BusDirection();
+            BusDirection routes = new BusDirection(new ArrayList<>(), new ArrayList<>());
             //loop 3 times because we have 3 url to check
             int j = 0;
             for (int i = 0; i < 3; i++) {

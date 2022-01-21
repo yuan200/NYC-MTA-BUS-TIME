@@ -1,26 +1,16 @@
 package com.wen.android.mtabuscomparison.util;
 
 import android.net.Uri;
-import android.util.Log;
 
 import com.wen.android.mtabuscomparison.BusApplication;
 import com.wen.android.mtabuscomparison.R;
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.BusDirection;
-import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopInfo;
-import com.wen.android.mtabuscomparison.feature.stopmonitoring.StopMonitoringListItem;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Scanner;
 
 import timber.log.Timber;
@@ -122,200 +112,97 @@ public final class NetworkUtilities {
     }
 
     /**
-     * read item from the json object
-     * @param result
-     * @param item
-     * @return
-     */
-    public static List<StopMonitoringListItem> getSpecificItem(String result, String item){
-        StopMonitoringListItem stopMonitoringListItemObject = new StopMonitoringListItem();
-        ArrayList<StopMonitoringListItem> stopsStopMonitoringListItem = new ArrayList<>();
-        try{
-            JSONObject jsonObject = new JSONObject(result);
-            JSONObject siriJsonObject = jsonObject.getJSONObject("Siri");
-            JSONObject serveicDeliveryObject =siriJsonObject.getJSONObject("ServiceDelivery");
-            JSONArray stopMonitoringDelivery = serveicDeliveryObject.getJSONArray("StopMonitoringDelivery");
-            JSONObject stopMonitoringDeliveryJsonObject = stopMonitoringDelivery.getJSONObject(0);
-
-            // check if there are error
-            if (stopMonitoringDeliveryJsonObject.has("ErrorCondition")){
-                JSONObject errorConditionJsonObject = stopMonitoringDeliveryJsonObject.getJSONObject("ErrorCondition");
-                if (errorConditionJsonObject.has("OtherError")){
-                    JSONObject otherErrorJsonObject = errorConditionJsonObject.getJSONObject("OtherError");
-                    stopMonitoringListItemObject.setFail(false);
-                    stopMonitoringListItemObject.setErrorMessage(otherErrorJsonObject.getString("ErrorText"));
-                    stopsStopMonitoringListItem.add(stopMonitoringListItemObject);
-                    return stopsStopMonitoringListItem;
-                }else{
-                    stopMonitoringListItemObject.setFail(false);
-                    stopsStopMonitoringListItem.add(stopMonitoringListItemObject);
-                    return stopsStopMonitoringListItem;
-                }
-            }
-
-            JSONArray monitorStopVisitJsonArray = stopMonitoringDeliveryJsonObject.getJSONArray("MonitoredStopVisit");
-            // if monitorStopVIsitJsonArray == 0 then there is no track service
-            if (monitorStopVisitJsonArray.length() == 0){
-                stopMonitoringListItemObject.setFail(false);
-                stopMonitoringListItemObject.setErrorMessage("We are not tracking any buses to this stop at this time. check back later for an upate.");
-                stopsStopMonitoringListItem.add(stopMonitoringListItemObject);
-                return stopsStopMonitoringListItem;
-            }
-            //loop through bus time info
-            for (int i = 0; i < monitorStopVisitJsonArray.length(); i++){
-                StopMonitoringListItem stopStopMonitoringListItem = new StopMonitoringListItem();
-
-                JSONObject monitoredVehicleJourneyJsonObject = monitorStopVisitJsonArray.getJSONObject(i);
-                JSONObject monitoredVehicleJourneyJsonObject1 = monitoredVehicleJourneyJsonObject.getJSONObject("MonitoredVehicleJourney");
-                if (monitoredVehicleJourneyJsonObject1.has("OriginAimedDepartureTime")){
-                    stopStopMonitoringListItem.setExpectedDepartureTime(monitoredVehicleJourneyJsonObject1.getString("OriginAimedDepartureTime"));
-                }else{
-                    stopStopMonitoringListItem.setExpectedDepartureTime("NoOriginAimedDepartureTime");
-                }
-                stopStopMonitoringListItem.setPublishedLineName(monitoredVehicleJourneyJsonObject1.getString("PublishedLineName"));
-                stopStopMonitoringListItem.setDestinationName(monitoredVehicleJourneyJsonObject1.getString("DestinationName"));
-
-                JSONObject monitoredCallJsonObject = monitoredVehicleJourneyJsonObject1.getJSONObject("MonitoredCall");
-
-                stopStopMonitoringListItem.setStopPointName(monitoredCallJsonObject.getString("StopPointName"));
-                if (monitoredCallJsonObject.has("ArrivalProximityText")){
-                    stopStopMonitoringListItem.setArrivalProximityText(monitoredCallJsonObject.getString("ArrivalProximityText"));
-                }else{
-                    stopStopMonitoringListItem.setArrivalProximityText("can not track distance now");
-                }
-
-                //check if the return object has ExpectedArrivalTime, if no then doesn't need to calculate the remain time
-                if (monitoredCallJsonObject.has("ExpectedArrivalTime")){
-                    stopStopMonitoringListItem.setExpectedArrivalTime(monitoredCallJsonObject.getString("ExpectedArrivalTime"));
-                } else{
-                    stopStopMonitoringListItem.setExpectedArrivalTime("NoExpectedItem");
-                }
-                if (monitoredCallJsonObject.has("StopPointRef")){
-                    stopStopMonitoringListItem.setStopNumber(monitoredCallJsonObject.getString("StopPointRef"));
-                }
-                Iterator<String> keys = monitoredCallJsonObject.keys();
-
-                JSONObject distanceJsonObject = monitoredCallJsonObject.getJSONObject("Extensions");
-                JSONObject presentableDistanceJsonObject = distanceJsonObject.getJSONObject("Distances");
-                if (presentableDistanceJsonObject.has("PresentableDistance")){
-                    stopStopMonitoringListItem.setPresentableDistance( presentableDistanceJsonObject.getString("PresentableDistance"));
-                    stopStopMonitoringListItem.setStopsFromCall(presentableDistanceJsonObject.getString("PresentableDistance"));
-                } else{
-                    stopStopMonitoringListItem.setPresentableDistance("NoNumberOfStopsAway");
-                }
-
-                stopsStopMonitoringListItem.add(stopStopMonitoringListItem);
-            }
-            return stopsStopMonitoringListItem;
-
-        } catch(JSONException e){
-            e.printStackTrace();
-            stopMonitoringListItemObject.setFail(false);
-            stopMonitoringListItemObject.setErrorMessage("Sorry, We can't track the bus now");
-        }
-        return null;
-
-    }
-
-    /**
      * read info from json
      * @param result
      * @return
      */
     public static BusDirection getStopListForRoute(String result){
-        BusDirection busDirection = new BusDirection();
-        ArrayList<StopInfo> stopInfoList0 = new ArrayList<>();
-        ArrayList<StopInfo> stopInfoList1 = new ArrayList<>();
-        try{
-            JSONObject rootJsonObject = new JSONObject(result);
-            String code = rootJsonObject.getString("code");
-            /**if code does not equal to 200 then something went wrong(ex incorrect route number), display a error message and don't let it crash the app
-            *
-             **/
-            if (!code.equals("200")){
-                StopInfo errorStop = new StopInfo();
-                errorStop.setId("error");
-                stopInfoList0.add(errorStop);
-                stopInfoList1.add(errorStop);
-                busDirection.setDirection0(stopInfoList0);
-                busDirection.setDirection1(stopInfoList1);
-                Log.i("error checking: " , "handle error success");
-                return busDirection;
-            }
-            JSONObject dataJsonObject = rootJsonObject.getJSONObject("data");
-            JSONArray stopGroupingsJsonObject = dataJsonObject.getJSONArray("stopGroupings");
-            JSONObject stopGoupingsJsonObject1 = stopGroupingsJsonObject.getJSONObject(0);
-            JSONArray stopGroupsJsonObject = stopGoupingsJsonObject1.getJSONArray("stopGroups");
-            //stopGroups sub object 1
-            JSONObject stopGroupsSubObject0 = stopGroupsJsonObject.getJSONObject(0);
-            String id = stopGroupsSubObject0.getString("id");
-            Log.i("json array!!!", "json array: " + id);
-            JSONObject nameJsonObject = stopGroupsSubObject0.getJSONObject("name");
+//        BusDirection busDirection = new BusDirection();
+//        ArrayList<StopInfo> stopInfoList0 = new ArrayList<>();
+//        ArrayList<StopInfo> stopInfoList1 = new ArrayList<>();
+//        try{
+//            JSONObject rootJsonObject = new JSONObject(result);
+//            String code = rootJsonObject.getString("code");
+//            /**if code does not equal to 200 then something went wrong(ex incorrect route number), display a error message and don't let it crash the app
+//            *
+//             **/
+//            if (!code.equals("200")){
+//                StopInfo errorStop = new StopInfo();
+//                errorStop.setId("error");
+//                stopInfoList0.add(errorStop);
+//                stopInfoList1.add(errorStop);
+//                busDirection.setDirection0(stopInfoList0);
+//                busDirection.setDirection1(stopInfoList1);
+//                Log.i("error checking: " , "handle error success");
+//                return busDirection;
+//            }
+//            JSONObject dataJsonObject = rootJsonObject.getJSONObject("data");
+//            JSONArray stopGroupingsJsonObject = dataJsonObject.getJSONArray("stopGroupings");
+//            JSONObject stopGoupingsJsonObject1 = stopGroupingsJsonObject.getJSONObject(0);
+//            JSONArray stopGroupsJsonObject = stopGoupingsJsonObject1.getJSONArray("stopGroups");
+//            //stopGroups sub object 1
+//            JSONObject stopGroupsSubObject0 = stopGroupsJsonObject.getJSONObject(0);
+//
+//            JSONObject nameJsonObject = stopGroupsSubObject0.getJSONObject("name");
+//
+//            //direction
+//            JSONArray stopIdsJsonArray = stopGroupsSubObject0.getJSONArray("stopIds");
+//
+//            //stop id
+//            for (int i = 0; i< stopIdsJsonArray.length(); i++){
+//                StopInfo stop = new StopInfo();
+//                String stopIds = stopIdsJsonArray.getString(i);
+//                Log.i("json array!!!", "json array: " + stopIds);
+//                stop.setId(stopIds);
+//                stop.setBusDirection(nameJsonObject.getString("name"));
+//                stopInfoList0.add(stop);
+//            }
+//
+//            // stopGroups sub object 2
+//            JSONObject stopGroupsSubObject1 = stopGroupsJsonObject.getJSONObject(1);
+//            JSONObject nameJsonObject2 = stopGroupsSubObject1.getJSONObject("name");
+//            JSONArray stopIdsJsonArray2 = stopGroupsSubObject1.getJSONArray("stopIds");
+//
+//            for (int i = 0; i< stopIdsJsonArray2.length(); i++){
+//                StopInfo stop = new StopInfo();
+//                String stopIds = stopIdsJsonArray2.getString(i);
+//                Log.i("json array!!!", "json array: " + stopIds);
+//                stop.setId(stopIds);
+//                stop.setBusDirection(nameJsonObject2.getString("name"));
+//                stopInfoList1.add(stop);
+//            }
+//
+//            JSONArray stopsJsonArray = dataJsonObject.getJSONArray("stops");
+//            for (int i = 0; i < stopsJsonArray.length(); i++){
+//                JSONObject stopObject = stopsJsonArray.getJSONObject(i);
+//                String stopid = stopObject.getString("id");
+//                for (int j = 0; j < stopInfoList0.size(); j++){
+//                    StopInfo stop = stopInfoList0.get(j);
+//                    if (stopid.equals(stop.getId())){
+//                        stop.setStopCode(stopObject.getString("code"));
+//                        stop.setIntersections(stopObject.getString("name"));
+//                        stopInfoList0.set(j, stop);
+//                    }
+//                }
+//                for (int j = 0; j < stopInfoList1.size(); j++){
+//                    StopInfo stop = stopInfoList1.get(j);
+//                    if (stopid.equals(stop.getId())){
+//                        stop.setStopCode(stopObject.getString("code"));
+//                        stop.setIntersections(stopObject.getString("name"));
+//                        stopInfoList1.set(j, stop);
+//                    }
+//                }
+//            }
+//
+//            busDirection.setDirection0(stopInfoList0);
+//            busDirection.setDirection1(stopInfoList1);
+//
+//
+//        } catch (JSONException e){
+//            e.printStackTrace();
+//        }
 
-            //direction
-            String name = nameJsonObject.getString("name");
-            Log.i("json array!!!", "json array: " + name);
-            JSONArray stopIdsJsonArray = stopGroupsSubObject0.getJSONArray("stopIds");
-
-            //stop id
-            for (int i = 0; i< stopIdsJsonArray.length(); i++){
-                StopInfo stop = new StopInfo();
-                String stopIds = stopIdsJsonArray.getString(i);
-                Log.i("json array!!!", "json array: " + stopIds);
-                stop.setId(stopIds);
-                stop.setBusDirection(nameJsonObject.getString("name"));
-                stopInfoList0.add(stop);
-            }
-
-            // stopGroups sub object 2
-            JSONObject stopGroupsSubObject1 = stopGroupsJsonObject.getJSONObject(1);
-            String id2 = stopGroupsSubObject1.getString("id");
-            Log.i("json array!!!", "json array: " + id2);
-            JSONObject nameJsonObject2 = stopGroupsSubObject1.getJSONObject("name");
-            String name2= nameJsonObject2.getString("name");
-            Log.i("json array!!!", "json array: " + name2);
-            JSONArray stopIdsJsonArray2 = stopGroupsSubObject1.getJSONArray("stopIds");
-
-            for (int i = 0; i< stopIdsJsonArray2.length(); i++){
-                StopInfo stop = new StopInfo();
-                String stopIds = stopIdsJsonArray2.getString(i);
-                Log.i("json array!!!", "json array: " + stopIds);
-                stop.setId(stopIds);
-                stop.setBusDirection(nameJsonObject2.getString("name"));
-                stopInfoList1.add(stop);
-            }
-
-            JSONArray stopsJsonArray = dataJsonObject.getJSONArray("stops");
-            for (int i = 0; i < stopsJsonArray.length(); i++){
-                JSONObject stopObject = stopsJsonArray.getJSONObject(i);
-                String stopid = stopObject.getString("id");
-                for (int j = 0; j < stopInfoList0.size(); j++){
-                    StopInfo stop = stopInfoList0.get(j);
-                    if (stopid.equals(stop.getId())){
-                        stop.setStopCode(stopObject.getString("code"));
-                        stop.setIntersections(stopObject.getString("name"));
-                        stopInfoList0.set(j, stop);
-                    }
-                }
-                for (int j = 0; j < stopInfoList1.size(); j++){
-                    StopInfo stop = stopInfoList1.get(j);
-                    if (stopid.equals(stop.getId())){
-                        stop.setStopCode(stopObject.getString("code"));
-                        stop.setIntersections(stopObject.getString("name"));
-                        stopInfoList1.set(j, stop);
-                    }
-                }
-            }
-
-            busDirection.setDirection0(stopInfoList0);
-            busDirection.setDirection1(stopInfoList1);
-
-
-        } catch (JSONException e){
-            e.printStackTrace();
-        }
-
-        return busDirection;
+        return null;
     }
 
 }

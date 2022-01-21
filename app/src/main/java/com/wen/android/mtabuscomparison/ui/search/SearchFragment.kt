@@ -2,7 +2,6 @@ package com.wen.android.mtabuscomparison.ui.search
 
 import android.app.Activity
 import android.content.Context.INPUT_METHOD_SERVICE
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,13 +9,13 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.logEvent
 import com.wen.android.mtabuscomparison.R
 import com.wen.android.mtabuscomparison.feature.search.SearchResultItem
 import com.wen.android.mtabuscomparison.feature.search.SearchType
-import com.wen.android.mtabuscomparison.ui.routesview.RoutesViewActivity
 import com.wen.android.mtabuscomparison.util.SearchHandler
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
@@ -27,11 +26,15 @@ import javax.inject.Inject
 class SearchFragment : Fragment(), SearchViewMvc.Listener {
 
     @Inject
-    lateinit var firebaseAnalytics:FirebaseAnalytics
+    lateinit var firebaseAnalytics: FirebaseAnalytics
 
     private lateinit var mSearchView: SearchViewMvc
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
 
         mSearchView = SearchViewMvcImpl(layoutInflater, null).also {
@@ -72,7 +75,10 @@ class SearchFragment : Fragment(), SearchViewMvc.Listener {
                 hideKeyboard(requireActivity())
                 val latLng = LatLng(searchResult.lat!!, searchResult.lng!!)
                 NavHostFragment.findNavController(this).apply {
-                    previousBackStackEntry?.savedStateHandle?.set(getString(R.string.SEARCH_RESULT_POINT), latLng)
+                    previousBackStackEntry?.savedStateHandle?.set(
+                        getString(R.string.SEARCH_RESULT_POINT),
+                        latLng
+                    )
                     popBackStack()
                 }
             }
@@ -91,7 +97,8 @@ class SearchFragment : Fragment(), SearchViewMvc.Listener {
     private fun displaySearchResult(userInput: String) {
         val bundle = Bundle()
         bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM, userInput)
-        FirebaseAnalytics.getInstance(requireContext()).logEvent(FirebaseAnalytics.Event.SEARCH, bundle)
+        FirebaseAnalytics.getInstance(requireContext())
+            .logEvent(FirebaseAnalytics.Event.SEARCH, bundle)
         val searchHandler = SearchHandler(userInput)
         if (searchHandler.keywordType() == SearchType.STOP) {
             val stopcodeArray = arrayOfNulls<String>(1)
@@ -106,6 +113,7 @@ class SearchFragment : Fragment(), SearchViewMvc.Listener {
             viewRoute(routeEntered)
         }
     }
+
     private fun hideKeyboard(activity: Activity) {
         val imm = activity.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         //Find the currently focused view, so we can grab the correct window token from it.
@@ -121,8 +129,12 @@ class SearchFragment : Fragment(), SearchViewMvc.Listener {
      * @param route need to be uppercase
      */
     private fun viewRoute(route: String) {
-        val intent = Intent(requireContext(), RoutesViewActivity::class.java)
-        intent.putExtra(Intent.EXTRA_TEXT, route)
-        startActivity(intent)
+        findNavController().navigate(
+            SearchFragmentDirections.actionSearchFragmentToStopRouteFragment(route)
+        )
+
+//        val intent = Intent(requireContext(), RoutesViewActivity::class.java)
+//        intent.putExtra(Intent.EXTRA_TEXT, route)
+//        startActivity(intent)
     }
 }

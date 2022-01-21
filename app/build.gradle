@@ -178,6 +178,7 @@ dependencies {
     // Integration with observables
     implementation 'androidx.compose.runtime:runtime-livedata:1.1.0-rc01'
     implementation 'androidx.compose.runtime:runtime-rxjava2:1.1.0-rc01'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0'
 
 
     def lifecycle_version = '2.4.0'

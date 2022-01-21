@@ -50,5 +50,24 @@
         <action
             android:id="@+id/action_searchFragment_to_stopMonitoringFragment"
             app:destination="@id/stopMonitoringFragment" />
+        <action
+            android:id="@+id/action_searchFragment_to_stopRouteFragment"
+            app:destination="@id/stopRouteFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/stopRouteFragment"
+        android:name="com.wen.android.mtabuscomparison.feature.stoproute.StopRouteFragment"
+        android:label="stop_route_fragment"
+        tools:layout="@layout/stop_route_fragment" >
+        <argument
+            android:name="route"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_stopRouteFragment_to_stopMonitoringFragment"
+            app:destination="@id/stopMonitoringFragment" >
+            <argument
+                android:name="isFavorite"
+                android:defaultValue="false" />
+        </action>
     </fragment>
 </navigation>

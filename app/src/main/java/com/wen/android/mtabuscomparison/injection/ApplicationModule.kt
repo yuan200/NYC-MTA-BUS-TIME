@@ -11,6 +11,8 @@ import com.wen.android.mtabuscomparison.feature.stopmonitoring.BusDatabase
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.BusStopDao
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.storage.repo.DefaultStopMonitoringRepository
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.storage.repo.StopMonitoringRepository
+import com.wen.android.mtabuscomparison.feature.stoproute.StopRouteRepository
+import com.wen.android.mtabuscomparison.feature.stoproute.StopRouteRepositoryImpl
 import com.wen.android.mtabuscomparison.ui.stopmap.DefaultNearByRepository
 import com.wen.android.mtabuscomparison.ui.stopmap.NearByRepository
 import dagger.Module
@@ -32,7 +34,7 @@ class ApplicationModule {
     @Singleton
     fun provideRetrofit(): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("http://bustime.mta.info/api/siri/")
+            .baseUrl("http://bustime.mta.info/api/")
             .client(createClient())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -56,6 +58,11 @@ class ApplicationModule {
     @Provides
     @Singleton
     fun provideNearByStopRepository(dataSource: DefaultNearByRepository): NearByRepository =
+        dataSource
+
+    @Provides
+    @Singleton
+    fun provideStopRouteRepository(dataSource: StopRouteRepositoryImpl): StopRouteRepository =
         dataSource
 
     @Provides

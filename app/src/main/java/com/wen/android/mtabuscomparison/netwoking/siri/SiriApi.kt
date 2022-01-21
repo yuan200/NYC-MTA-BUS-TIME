@@ -7,7 +7,7 @@ import retrofit2.http.Query
 
 interface SiriApi {
 
-    @GET("stop-monitoring.json")
+    @GET("siri/stop-monitoring.json")
     suspend fun stopMonitoring(
         @Query("key") key: String,
         @Query("MonitoringRef") monitoringRef: String
