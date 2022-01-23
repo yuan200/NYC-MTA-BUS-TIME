@@ -266,9 +266,6 @@ dependencies {
 //    androidTestImplementation "com.squareup.retrofit2:retrofit-$version_retrofit"
 
 
-    //todo deprecated
-    implementation 'com.github.aakira:expandable-layout:1.6.0@aar'
-
     implementation 'com.google.code.gson:gson:2.8.9'
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
