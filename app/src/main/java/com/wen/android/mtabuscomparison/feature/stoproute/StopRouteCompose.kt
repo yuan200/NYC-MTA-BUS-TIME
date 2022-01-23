@@ -1,5 +1,6 @@
 package com.wen.android.mtabuscomparison.feature.stoproute
 
+import android.annotation.SuppressLint
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -72,6 +73,7 @@ fun StopRouteCard(
     }
 }
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun SnackbarScreen(message: String) {
     val scope = rememberCoroutineScope()
