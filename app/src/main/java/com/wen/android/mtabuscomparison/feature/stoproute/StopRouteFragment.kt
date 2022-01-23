@@ -9,11 +9,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.Button
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
 import androidx.compose.ui.unit.dp
@@ -21,8 +19,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.logEvent
 import com.wen.android.mtabuscomparison.R
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class StopRouteFragment : Fragment() {
@@ -31,12 +32,19 @@ class StopRouteFragment : Fragment() {
 
     private val args: StopRouteFragmentArgs by navArgs()
 
+    @Inject
+    lateinit var firebaseAnalytics: FirebaseAnalytics
+
     companion object {
         fun newInstance() = StopRouteFragment()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
+            param(FirebaseAnalytics.Param.SCREEN_NAME, StopRouteFragment::class.java.simpleName)
+        }
 
         viewModel.getStopRoute(args.route, getString(R.string.mta_bus_api_key))
 
@@ -61,6 +69,9 @@ class StopRouteFragment : Fragment() {
                         busDirection?.let {
                             Button(
                                 modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = if (direction == 0) Color.Gray else MaterialTheme.colors.primary
+                                ),
                                 onClick = {
                                     viewModel.direction.value = 0
                                 }) {
@@ -68,6 +79,9 @@ class StopRouteFragment : Fragment() {
                             }
                             Button(
                                 modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = if (direction == 1) Color.Gray else MaterialTheme.colors.primary
+                                ),
                                 onClick = {
                                     viewModel.direction.value = 1
                                 }) {

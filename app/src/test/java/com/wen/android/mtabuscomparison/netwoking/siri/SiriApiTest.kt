@@ -61,7 +61,7 @@ class SiriApiTest {
 
         val request = webServer.takeRequest(5, TimeUnit.SECONDS)!!
         request.method shouldBe "GET"
-        request.path shouldBe "/stop-monitoring.json?key=key&MonitoringRef=stopId"
+        request.path shouldBe "/siri/stop-monitoring.json?key=key&MonitoringRef=stopId"
     }
 
 }
