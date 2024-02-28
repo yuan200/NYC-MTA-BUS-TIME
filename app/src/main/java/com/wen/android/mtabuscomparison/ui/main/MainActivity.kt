@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
 
         /*  for UI test */
         if (savedInstanceState == null) {
-            val currentNavId = navController.graph.startDestination
+            val currentNavId = navController.graph.startDestinationId
             val requestedNavId = intent.getIntExtra(EXTRA_NAVIGATION_ID, currentNavId)
             val requestedBundle = intent.getBundleExtra(EXTRA_NAVIGATION_BUNDLE) ?: Bundle.EMPTY
             navigateTo(requestedNavId, currentNavId, requestedBundle)

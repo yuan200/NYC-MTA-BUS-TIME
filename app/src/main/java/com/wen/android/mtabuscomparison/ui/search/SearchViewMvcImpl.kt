@@ -14,7 +14,14 @@ import com.wen.android.mtabuscomparison.ui.commom.BaseObservableViewMvc
 import com.wen.android.mtabuscomparison.ui.textChanges
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 class SearchViewMvcImpl(inflater: LayoutInflater, parent: ViewGroup?) :
@@ -58,13 +65,13 @@ class SearchViewMvcImpl(inflater: LayoutInflater, parent: ViewGroup?) :
                     40.496094, -74.295208,
                     41.020723, -73.563419
                 )
-                    .map {
+                    ?.map {
                         SearchResultItem(
                             "${((it.subThoroughfare ?: "") + " " + (it.thoroughfare ?: "")).ifBlank { it.featureName }}",
                             null, SearchType.MAP, it.latitude, it.longitude
                         )
                     }
-                searchResults.addAll(addresses)
+                searchResults.addAll(addresses!!)
             }
         } catch (e: Exception) {
             Timber.e(e.message)

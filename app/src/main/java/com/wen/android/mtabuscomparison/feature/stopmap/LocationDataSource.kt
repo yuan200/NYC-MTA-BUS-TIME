@@ -21,7 +21,7 @@ class LocationDataSource
             override fun onLocationResult(result: LocationResult?) {
                 result ?: return
                 try {
-                    offer(result.lastLocation)
+                    trySend(result.lastLocation)
                 } catch (e: Exception) {
                 }
             }
@@ -31,7 +31,7 @@ class LocationDataSource
             it ?: return@addOnSuccessListener
             try {
                 Timber.v(it.toString())
-                offer(it)
+                trySend(it)
             } catch (e: java.lang.Exception) {
             }
 
