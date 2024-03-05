@@ -26,15 +26,15 @@ import com.wen.android.mtabuscomparison.databinding.FragmentFavoriteBinding
 import com.wen.android.mtabuscomparison.feature.favorite.Favorite
 import com.wen.android.mtabuscomparison.feature.favorite.FavoriteStop
 import com.wen.android.mtabuscomparison.feature.stopmonitoring.BusDatabase
+import com.wen.android.mtabuscomparison.ui.favorite.coachmark.Coachmark
 import com.wen.android.mtabuscomparison.util.observe2
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.*
+import java.util.Date
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 @AndroidEntryPoint
 class FavoriteFragment : Fragment(), FavoriteAdapter.OnFavoriteClickedListener {
@@ -70,6 +70,12 @@ class FavoriteFragment : Fragment(), FavoriteAdapter.OnFavoriteClickedListener {
         binding.lifecycleOwner = viewLifecycleOwner
         val view = binding.root
         binding.busRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.emptyStationTv.setOnClickListener {
+//            Toast.makeText(context, "test test", Toast.LENGTH_LONG).show()
+            val coachMarker = Coachmark(requireContext(), it)
+            coachMarker.show()
+
+        }
         val simpleItemTouchCallBack =
             object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
                 override fun onMove(
